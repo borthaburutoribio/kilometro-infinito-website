@@ -8,9 +8,13 @@
   const fecha = s => { const [y, m, d] = s.split('-').map(Number); return `${d} de ${MESES[m - 1]} de ${y}`; };
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+  // Barra transparente sobre la foto, blanca al bajar
+  const barEl = $('.bar');
+  const onS = () => barEl.classList.toggle('solid', scrollY > 60);
+  addEventListener('scroll', onS, { passive: true }); onS();
   // Menú móvil
   const mt = $('.menu-t'), nav = $('.nav');
-  if (mt) mt.addEventListener('click', () => { const o = nav.classList.toggle('open'); mt.setAttribute('aria-expanded', o); mt.textContent = o ? 'Cerrar' : 'Menú'; });
+  if (mt) mt.addEventListener('click', () => { const o = nav.classList.toggle('open'); barEl.classList.toggle('open', o); mt.setAttribute('aria-expanded', o); mt.textContent = o ? 'Cerrar' : 'Menú'; });
 
   // Entradas al hacer scroll
   $$('.ph>.wrap,.sec>.wrap').forEach(x => { if (!x.querySelector('.rv') && !x.classList.contains('rv')) x.classList.add('rv'); });
@@ -181,10 +185,10 @@
   }
 
   // Año fijo de la historia
-  const yr = $('[data-story-year]');
-  if (yr && 'IntersectionObserver' in window) {
-    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) yr.textContent = e.target.dataset.y; }), { rootMargin: '-45% 0px -45% 0px' });
-    $$('.step[data-y]').forEach(s => io.observe(s));
+  const sbg = $$('.story-bg img');
+  if (sbg.length && 'IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { const k = +e.target.dataset.i; sbg.forEach((im, n) => im.classList.toggle('on', n === k)); } }), { rootMargin: '-45% 0px -45% 0px' });
+    $$('.step[data-i]').forEach(s => io.observe(s));
   }
 
   // Número que sube

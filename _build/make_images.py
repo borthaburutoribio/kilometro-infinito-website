@@ -69,10 +69,10 @@ def debar(im):
     g = im.convert('L')
     w, h = g.size
     top = 0
-    while top < h // 2 and sum(g.crop((0, top, w, top + 1)).getdata()) / w < 14:
+    while top < h // 2 and sum(g.crop((0, top, w, top + 1)).get_flattened_data()) / w < 14:
         top += 2
     bot = h
-    while bot > h // 2 and sum(g.crop((0, bot - 1, w, bot)).getdata()) / w < 14:
+    while bot > h // 2 and sum(g.crop((0, bot - 1, w, bot)).get_flattened_data()) / w < 14:
         bot -= 2
     return im.crop((0, top, w, bot))
 
@@ -91,9 +91,11 @@ for f in glob.glob(str(B / 'raw' / 'ig_sel' / 'kmi-ig-*.jpg')):
     name, alt = P[i]
     name = name.replace('ó', 'o').replace('ñ', 'n')
     im = grade(debar(Image.open(f).convert('RGB')))
+    if name == 'largada-mtb-arco-negro-peloton':
+        im = im.crop((0, 0, im.size[0], int(im.size[1] * .86)))
     w, h = im.size
-    if max(w, h) > 1800:
-        im.thumbnail((1800, 1800), Image.LANCZOS)
+    if max(w, h) > 2200:
+        im.thumbnail((2200, 2200), Image.LANCZOS)
     w, h = im.size
     im.save(OUT / f'{name}.webp', quality=78, method=6)
     manifest[name] = {'alt': alt, 'w': w, 'h': h}

@@ -7,7 +7,7 @@ SITE = B.parent
 D = B / 'data'
 NOINDEX = True          # muestra: al lanzar con el dominio real, poner False
 DOMAIN = 'https://www.kilometroinfinito.com.ar'
-V = "6"
+V = "8"
 WA = '5492494551251'    # (0249) 15-455-1251, A CONFIRMAR que tenga WhatsApp
 FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSegLqTnWHF24_hhah0eCGhpEGIKlq71XwLnVv1Ek3I0skuifA/viewform'
 MAIL = 'kminfinito@live.com.ar'
@@ -55,8 +55,9 @@ written = []
 
 def page(path, title, desc, body, active='', schema=None, noindex=False, sitemap=True, fab=True, canonical=True, band=None):
     """path sin barra inicial: 'calendario/index.html' o 'p/x.html'."""
-    if band:
-        body = body.replace('</section>', '</section><div class="band">' + img(band, lazy=False) + '</div>', 1)
+    hero_list = ['arco-bienvenidos-rojo-ciclistas', 'largada-mtb-arco-negro-peloton', 'ciclista-barro-arco-negro', 'corredores-reunidos-previa', 'largada-running-arco-rojo', 'ciclista-barro-bosque', 'podio-running-mar-de-cobo']
+    pic = band or hero_list[sum(map(ord, path)) % len(hero_list)]
+    body = body.replace('<section class="ph">', '<section class="ph">' + img(pic, 'ph-bg', lazy=False), 1)
     depth = path.count('/')
     R = '../' * depth or './'
     url = '/' + path.replace('index.html', '')
@@ -72,11 +73,11 @@ def page(path, title, desc, body, active='', schema=None, noindex=False, sitemap
 <meta name="description" content="{esc(desc)}">
 {robots}<link rel="canonical" href="{DOMAIN}{url}">
 <meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(desc)}"><meta property="og:type" content="website"><meta property="og:locale" content="es_AR">
-<meta property="og:image" content="{DOMAIN}/assets/img/largada-running-arco-rojo.webp"><meta name="theme-color" content="#FFE600">
+<meta property="og:image" content="{DOMAIN}/assets/img/largada-running-arco-rojo.webp"><meta name="theme-color" content="#0B1533">
 <link rel="icon" href="{R}assets/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{R}assets/styles.css?v={V}">{sc}
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{R}assets/kmi.css?v={V}">{sc}
 </head>
 <body>
 <a class="skip" href="#main">Saltar al contenido</a>
@@ -88,16 +89,10 @@ def page(path, title, desc, body, active='', schema=None, noindex=False, sitemap
 <main id="main">
 {body.replace('{{R}}', R)}
 </main>
-<footer>
-<div class="foot">
-<img src="{R}assets/img/largada-mtb-arco-negro-peloton.webp" alt="Pelotón de mountain bike bajo el arco negro, listo para largar" loading="lazy">
-<div class="foot-m on-ink">
-<p class="lead">Cronometraje, clasificación y locución de carreras. Ayacucho, provincia de Buenos Aires.</p>
+<footer><div class="wrap foot-m on-ink">
+<div><a class="brand" href="{R}"><img src="{R}assets/img/logo-kmi.webp" width="58" height="58" alt="">Kilómetro Infinito</a><p>Cronometraje, clasificación y locución de carreras. Ayacucho, provincia de Buenos Aires. “Único límite, tu imaginación”.</p></div>
 <ul>{''.join(f'<li><a href="{R}{u}">{n}</a></li>' for n, u in NAV)}<li><a href="{R}inscripcion/">Cómo inscribirme</a></li><li><a href="{R}contacto/">Contacto</a></li><li><a href="{IG}" rel="noopener">Instagram</a></li><li><a href="mailto:{MAIL}">{MAIL}</a></li></ul>
-</div></div>
-<div class="foot-name" aria-hidden="true">Kilómetro Infinito</div>
-<p class="credit">“Único límite, tu imaginación”. Sitio hecho por <a href="https://tranqueraweb.com.ar" rel="noopener">Tranquera Digital</a>.</p>
-</footer>
+</div><p class="wrap credit">Sitio hecho por <a href="https://tranqueraweb.com.ar" rel="noopener">Tranquera Digital</a>.</p></footer>
 {cta}
 <script src="{R}assets/script.js?v={V}" defer></script>
 </body></html>'''
@@ -173,30 +168,27 @@ races_json = '<script id="races-data" type="application/json">' + json.dumps([{'
 
 
 def race_row(r, h='h3'):
-    return f'''<li data-race-date="{r['date']}T23:59:00-03:00" class="rv">
+    return f"""<li data-race-date="{r['date']}T23:59:00-03:00">
 {flyer(r['flyer'], r['name'], 'fl')}
-<div><{h}><a href="{{{{R}}}}calendario/{r['id']}/">{esc(r['name'])}</a></{h}><p class="when">{when(r)} · {esc(r['place'])}</p><p class="st">{esc(r['status'].split(':')[0].split(', todavía')[0])}</p></div>
-<div class="btns"><a class="btn line" href="{{{{R}}}}calendario/{r['id']}/">Ver carrera</a></div>
-</li>'''
+<div class="tx"><{h}><a href="{{{{R}}}}calendario/{r['id']}/">{esc(r['name'])}</a></{h}><p class="when">{when(r)} · {esc(r['place'])}</p><p class="st">{esc(r['status'].split(':')[0].split(', todavía')[0])}</p></div>
+</li>"""
 
 
 # ---------------------------------------------------------------- Portada
-FRAME = ['largada-running-arco-rojo', 'largada-mtb-arco-negro-peloton', 'eucaliptos-curva-mtb', 'corredores-reunidos-previa', 'podio-running-mar-de-cobo']
+FRAME = ['largada-mtb-arco-negro-peloton', 'largada-running-arco-rojo', 'arco-bienvenidos-rojo-ciclistas', 'corredores-reunidos-previa', 'ciclista-barro-arco-negro']
 frame = ''.join((f'<img class="on" src="{{{{R}}}}assets/img/{n}.webp" alt="{esc(PH[n]["alt"])}" fetchpriority="high">' if i == 0 else f'<img data-src="{{{{R}}}}assets/img/{n}.webp" alt="{esc(PH[n]["alt"])}">') for i, n in enumerate(FRAME))
-wall_list = [e for e in E if e['flyer'] and (SITE / 'assets/afiches' / (e['flyer'][:-4] + '.webp')).exists()][:26]
-wall = ''.join(flyer(e['flyer'], e['name']) for e in wall_list) * 2
 
 STEPS = [
- ('2006', 'adrian-poo-sombrero-carpa', 'Cámaras de camión y un arroyo', '29 de enero, Club Independiente de Ayacucho. Campo Aventura: 8 horas, 51 participantes corriendo, pedaleando y navegando el arroyo Tandileofú en balsas hechas con cámaras de camión. En abril, 162 atletas en el Maratón Fiesta del Ternero.'),
- ('2007', 'sendero-verde-arco-al-fondo', 'De dónde sale el nombre', 'Entrenando kilómetros y kilómetros para el Cruce de los Andes, 104 km en tres etapas. Ahí nos cayó la ficha: no hay límite, solo el que nosotros nos pongamos. Y entró la invitación del Ayacucho Cicles Club para organizar su ciclismo rural.'),
- ('2008', 'pelotón-mtb-camino-tierra'.replace('ó', 'o'), 'El primer campeonato', 'Cuatro fechas de ciclismo rural en Ayacucho y 362 ciclistas sumando todas. Ese año también largamos un biatlón a las 12.30 en vez de a las 10, porque la niebla no dejaba ver a dos metros.'),
- ('2009', 'copas-mesa-premios', 'Nos llaman de afuera', 'Primera vez fuera de Ayacucho: el Rally de Barker–Villa Cacique, con 105 ciclistas. A fin de año, 99 en el Rural Bike de la Sociedad Rural: con lo recaudado, A.P.I.D.D.A. compró una fotocopiadora.'),
- ('2010', 'ciclista-barro-bosque', 'Rauch, bajo el agua', 'Fiscalización y locución del 1º Rural Bike Ciudad de Rauch: 147 bikers y una lluvia enorme. Terminaron igual. Desde ese año los resultados y las fotos van a la web.'),
- ('2024', 'recta-final-arco-naranja', 'Sudamericano en Balcarce', 'Clasificaciones del Campeonato Sudamericano de MTB, del 11 al 13 de octubre, y de los 1ros. Juegos Juveniles Nacionales de MTB, el 10.'),
- ('2026', 'adrian-poo-sombrero-locucion', '20 años no es nada', f'17° Campeonato KMI, Copa Bikes Amigorena. Y en esta web, {miles(S["results_unique"])} resultados de {miles(S["runners"])} corredores, buscables por nombre. Seguimos con la misma frase: único límite, tu imaginación.'),
+ ('2006', 'ciclista-barro-bosque', 'Cámaras de camión y un arroyo', '29 de enero, Club Independiente de Ayacucho. Campo Aventura: 8 horas, 51 participantes corriendo, pedaleando y navegando el arroyo Tandileofú en balsas hechas con cámaras de camión. En abril, 162 atletas en el Maratón Fiesta del Ternero.'),
+ ('2007', 'arco-bienvenidos-rojo-ciclistas', 'De dónde sale el nombre', 'Entrenando kilómetros y kilómetros para el Cruce de los Andes, 104 km en tres etapas. Ahí nos cayó la ficha: no hay límite, solo el que nosotros nos pongamos. Y entró la invitación del Ayacucho Cicles Club para organizar su ciclismo rural.'),
+ ('2008', 'largada-mtb-arco-negro-peloton', 'El primer campeonato', 'Cuatro fechas de ciclismo rural en Ayacucho y 362 ciclistas sumando todas. Ese año también largamos un biatlón a las 12.30 en vez de a las 10, porque la niebla no dejaba ver a dos metros.'),
+ ('2009', 'podio-running-mar-de-cobo', 'Nos llaman de afuera', 'Primera vez fuera de Ayacucho: el Rally de Barker–Villa Cacique, con 105 ciclistas. A fin de año, 99 en el Rural Bike de la Sociedad Rural: con lo recaudado, A.P.I.D.D.A. compró una fotocopiadora.'),
+ ('2010', 'ciclista-barro-arco-negro', 'Rauch, bajo el agua', 'Fiscalización y locución del 1º Rural Bike Ciudad de Rauch: 147 bikers y una lluvia enorme. Terminaron igual. Desde ese año los resultados y las fotos van a la web.'),
+ ('2024', 'ciclista-barro-bosque-rosa', 'Sudamericano en Balcarce', 'Clasificaciones del Campeonato Sudamericano de MTB, del 11 al 13 de octubre, y de los 1ros. Juegos Juveniles Nacionales de MTB, el 10.'),
+ ('2026', 'corredores-reunidos-previa', '20 años no es nada', f'17° Campeonato KMI, Copa Bikes Amigorena. Y en esta web, {miles(S["results_unique"])} resultados de {miles(S["runners"])} corredores, buscables por nombre. Seguimos con la misma frase: único límite, tu imaginación.'),
 ]
-story = '<section class="story" aria-label="Historia de Kilómetro Infinito"><div class="story-pin" aria-hidden="true"><div class="story-y" data-story-year>2006</div></div><div class="story-steps">' + ''.join(
-    f'<article class="step" data-y="{y}"><div style="grid-column:2;display:grid;gap:10px;min-width:0">{img(p)}<div class="txt"><h3>{y}. {t}</h3><p>{x}</p></div></div></article>' for y, p, t, x in STEPS) + '</div></section>'
+story = '<section class="story" aria-label="Historia de Kilómetro Infinito"><div class="story-bg" aria-hidden="true">' + ''.join(f'<img {"class=on " if i == 0 else ""}src="{{{{R}}}}assets/img/{p}.webp" alt="" loading="{"eager" if i == 0 else "lazy"}">' for i, (y, p, t, x) in enumerate(STEPS)) + '</div><div class="story-steps">' + ''.join(
+    f'<article class="step" data-y="{y}" data-i="{i}"><div class="card-g"><div class="y">{y}</div><h3>{t}</h3><p>{x}</p>{"<p class=note>Las fotos son de carreras de los últimos años.</p>" if i == 0 else ""}</div></article>' for i, (y, p, t, x) in enumerate(STEPS)) + '</div></section>'
 
 top = json.load(open(SITE / 'assets/data/names.json', encoding='utf8'))[:20]
 PHOTO_MOS = [('a', 'corredores-reunidos-previa'), ('b', 'operador-crono-notebook'), ('b', 'copas-mesa-premios'), ('b', 'duatleta-corriendo-numero'), ('b', 'ciclista-barro-bosque-rosa'), ('c', 'adrian-poo-selfie-sombrero'), ('e', 'eucaliptos-curva-mtb'),
@@ -229,44 +221,40 @@ place_list = ''.join(f'<li>{esc(n)} <b>{c}</b></li>' for n, c, *_ in ST['places'
 
 home = f'''
 <section class="hero">
-<div class="wrap hero-g">
-<h1><span class="w1">Kilómetro</span>
-<span class="w2">infinito</span></h1>
-<div class="hero-c">
-<p class="lead">Cronometramos carreras de mountain bike, duatlón y running en el sudeste bonaerense desde 2006.</p>
-<div class="btns"><a class="btn" href="{{{{R}}}}calendario/">Calendario e inscripción</a><a class="btn line" href="{{{{R}}}}resultados/">Ver resultados</a></div>
-</div>
 <div class="frame" data-swap>{frame}</div>
+<div class="hero-in"><div class="wrap hero-g">
+<div>
+<h1>Kilómetro Infinito</h1>
+<p class="lead">Cronometramos carreras de mountain bike, duatlón y running en el sudeste bonaerense desde 2006.</p>
+<div class="btns"><a class="btn y" href="{{{{R}}}}calendario/">Calendario e inscripción</a><a class="btn line" href="{{{{R}}}}resultados/">Ver resultados</a></div>
 </div>
-</section>
-<section class="nextbar on-ink" data-nextbar aria-label="Próxima carrera">
-<div class="wrap">
+<div class="nextcard" data-nextbar>
+<p class="lbl">Próxima carrera</p>
 <a class="t" data-n-name href="{{{{R}}}}calendario/{RACES[0]['id']}/">{esc(RACES[0]['name'])}<span class="d" data-n-when>{when(RACES[0])} · {RACES[0]['place']}</span></a>
 <div class="clock" data-clock="{RACES[0]['start']}" aria-label="Tiempo hasta la largada">0d 00:00:00</div>
-<a class="btn y" data-n-btn href="{{{{R}}}}calendario/{RACES[0]['id']}/">Ver carrera</a>
+<a class="btn w" style="width:100%;min-height:44px;padding:8px 18px" data-n-btn href="{{{{R}}}}calendario/{RACES[0]['id']}/">Ver carrera</a>
 </div>
+</div></div>
 </section>
 {races_json}
 
-<section class="find on-ink"><div class="wrap">
+<section class="full find on-ink">{img('arco-negro-llegada-camino', 'bg') if False else img('largada-running-arco-rojo', 'bg')}<div class="wrap">
 <div class="bigfig" data-count="{S['results_unique']}">{miles(S['results_unique'])}</div>
 <h2>tiempos publicados. Alguno es tuyo.</h2>
 {finder()}
 <p class="try">Probá con <a href="{{{{R}}}}corredor/?n={esc(top[0][0])}">{esc(top[0][0])}</a>, que corrió {top[0][1]} carreras, o con <a href="{{{{R}}}}corredor/?n={esc(top[1][0])}">{esc(top[1][0])}</a>, que corrió {top[1][1]}.</p>
-<div class="figs"><div><b class="num">{S['events']}</b>carreras en la web</div><div><b class="num">{miles(S['runners'])}</b>corredores distintos</div><div><b class="num">{S['places']}</b>localidades</div><div><b class="num">20</b>años de crono</div></div>
+<div class="figs"><div><b>{S['events']}</b>carreras en la web</div><div><b>{miles(S['runners'])}</b>corredores distintos</div><div><b>{S['places']}</b>localidades</div><div><b>20</b>años de crono</div></div>
 </div></section>
 
 <section class="sec yel"><div class="wrap">
-<div class="sec-h"><h2>Lo que viene</h2><p>Ponés tu año de nacimiento en cada carrera y te decimos tu categoría y cuánto pagás hoy.</p></div>
+<div class="sec-h"><h2>Lo que viene</h2><p>En cada carrera ponés tu año de nacimiento y te decimos tu categoría y cuánto pagás hoy.</p></div>
 <ul class="lineup">{''.join(race_row(r) for r in RACES)}</ul>
 </div></section>
-
-<div class="wall" aria-hidden="true"><div class="wall-t">{wall}</div></div>
 
 {story}
 
 <section class="sec"><div class="wrap scene">
-<div class="pic rv">{img('operador-crono-notebook')}</div>
+<div class="pic rv">{img('adrian-poo-sombrero-carpa')}</div>
 <div>
 <h2>Vos organizás. El reloj es nuestro.</h2>
 <ul class="say">
@@ -278,10 +266,7 @@ home = f'''
 </div>
 </div></section>
 
-<section class="sec ink on-ink"><div class="wrap mapg">
-<div class="rv">{mapsvg}</div>
-<div><h2>De Rauch a Quequén</h2><p style="margin:18px 0 24px;max-width:44ch">Carreras con resultados en esta web, por localidad. Balcarce va primero, pero Ayacucho es la casa.</p><ul class="places">{place_list}</ul></div>
-</div></section>
+<section class="full quote on-ink">{img('ciclista-barro-bosque-rosa', 'bg')}<div class="wrap"><p>Único límite, tu imaginación.</p></div></section>
 
 <section class="sec"><div class="wrap">
 <div class="sec-h"><h2>Barro, arcos y podios</h2><p>Sacadas en las carreras y publicadas en nuestro Instagram, <a href="{IG}" rel="noopener">@kminfinito</a>.</p></div>
@@ -289,16 +274,21 @@ home = f'''
 <p style="margin-top:22px"><a class="btn line" href="{{{{R}}}}fotos/">Ver todas las fotos y los afiches</a></p>
 </div></section>
 
+<section class="sec ink on-ink"><div class="wrap mapg">
+<div class="rv">{mapsvg}</div>
+<div><h2>De Rauch a Quequén</h2><p style="margin:16px 0 22px;max-width:44ch">Carreras con resultados en esta web, por localidad. Balcarce va primero, pero Ayacucho es la casa.</p><ul class="places">{place_list}</ul></div>
+</div></section>
+
 <section class="sec soft"><div class="wrap faqg">
-{img('adrian-poo-sombrero-carpa')}
-<div><h2 style="margin-bottom:24px">Lo que más nos preguntan</h2>
+{img('corredoras-sonrientes-podio')}
+<div><h2 style="margin-bottom:22px">Lo que más nos preguntan</h2>
 {''.join(f'<details{" open" if i == 0 else ""}><summary>{esc(q)}</summary><p>{esc(a)}</p></details>' for i, (q, a) in enumerate(FAQ))}
 </div></div></section>
 
-<section class="sec yel"><div class="wrap">
-<h2 style="margin-bottom:22px">Escribinos</h2>
+<section class="full contact on-ink">{img('arco-bienvenidos-rojo-ciclistas', 'bg')}<div class="wrap">
+<h2 style="margin-bottom:14px">Escribinos</h2>
 <a class="mail" href="mailto:{MAIL}">{MAIL}</a>
-<div class="btns" style="margin-top:26px"><a class="btn" href="https://wa.me/{WA}?text={esc('Hola Adrián! Te escribo desde la web de KMI.')}" rel="noopener">WhatsApp (0249) 15-455-1251</a><a class="btn line" href="{IG}" rel="noopener">Instagram @kminfinito</a></div>
+<div class="btns" style="margin-top:22px"><a class="btn y" href="https://wa.me/{WA}?text={esc('Hola Adrián! Te escribo desde la web de KMI.')}" rel="noopener">WhatsApp (0249) 15-455-1251</a><a class="btn line" href="{IG}" rel="noopener">Instagram @kminfinito</a></div>
 </div></section>
 '''
 page('index.html', 'Kilómetro Infinito | Cronometraje de carreras de MTB, duatlón y running', f'Cronometraje y clasificaciones de carreras en el sudeste bonaerense desde 2006. Buscá tu nombre entre {miles(S["results_unique"])} resultados y mirá el calendario con inscripción.', home, schema=[ORG, faq_schema(FAQ)])
