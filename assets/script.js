@@ -12,6 +12,12 @@
   const barEl = $('.bar');
   const onS = () => barEl.classList.toggle('solid', scrollY > 60);
   addEventListener('scroll', onS, { passive: true }); onS();
+  // Botón flotante: solo después de la portada, que ya tiene el suyo
+  const fabEl = $('.fab'), fabTop = $('.hero') || $('.ph');
+  if (fabEl && fabTop) {
+    const onF = () => fabEl.classList.toggle('wait', fabTop.getBoundingClientRect().bottom > 0);
+    addEventListener('scroll', onF, { passive: true }); addEventListener('resize', onF); onF();
+  }
   // Menú móvil
   const mt = $('.menu-t'), nav = $('.nav');
   if (mt) mt.addEventListener('click', () => { const o = nav.classList.toggle('open'); barEl.classList.toggle('open', o); mt.setAttribute('aria-expanded', o); mt.textContent = o ? 'Cerrar' : 'Menú'; });

@@ -353,3 +353,10 @@ tr.me td{background:#FFF3B8!important;font-weight:600}
 
 .mosaic .a{grid-column:span 6;grid-row:span 6}.mosaic .b{grid-column:span 3;grid-row:span 3}.mosaic .c{grid-column:span 4;grid-row:span 5}.mosaic .d{grid-column:span 4;grid-row:span 3}.mosaic .e{grid-column:span 8;grid-row:span 5}.mosaic .f{grid-column:span 3;grid-row:span 4}.mosaic .g{grid-column:span 5;grid-row:span 4}
 @media(max-width:760px){.mosaic .a,.mosaic .e{grid-column:span 12;grid-row:span 5}.mosaic .b,.mosaic .c,.mosaic .d,.mosaic .f,.mosaic .g{grid-column:span 6;grid-row:span 4}}
+
+/* El botón flotante aparece recién al pasar la portada */
+@media(max-width:760px){
+  .fab{transition:opacity .3s var(--ease),transform .3s var(--ease),visibility .3s}
+  .fab.wait{opacity:0;visibility:hidden;transform:translateY(16px);pointer-events:none}
+}
+@media(prefers-reduced-motion:reduce){.fab{transform:none!important;transition:opacity .3s linear,visibility .3s}}
