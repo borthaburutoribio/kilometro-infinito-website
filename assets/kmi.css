@@ -350,3 +350,6 @@ tr.me td{background:#FFF3B8!important;font-weight:600}
   .lineup>li:hover{transform:none}
 }
 @media(max-width:820px){.hero::after{background:linear-gradient(180deg,rgba(11,21,51,.45) 0,rgba(11,21,51,.3) 20%,rgba(11,21,51,.72) 45%,rgba(11,21,51,.94) 100%)}}
+
+.mosaic .a{grid-column:span 6;grid-row:span 6}.mosaic .b{grid-column:span 3;grid-row:span 3}.mosaic .c{grid-column:span 4;grid-row:span 5}.mosaic .d{grid-column:span 4;grid-row:span 3}.mosaic .e{grid-column:span 8;grid-row:span 5}.mosaic .f{grid-column:span 3;grid-row:span 4}.mosaic .g{grid-column:span 5;grid-row:span 4}
+@media(max-width:760px){.mosaic .a,.mosaic .e{grid-column:span 12;grid-row:span 5}.mosaic .b,.mosaic .c,.mosaic .d,.mosaic .f,.mosaic .g{grid-column:span 6;grid-row:span 4}}
