@@ -1,0 +1,4 @@
+_build/raw/
+_build/data/
+.taste-skill/
+__pycache__/
