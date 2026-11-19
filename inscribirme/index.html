@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es-AR" data-root="../">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inscribirme | Kilómetro Infinito</title>
+<meta name="description" content="Inscribite en las carreras con el crono de KMI: elegís la carrera, cargás tus datos, transferís y subís el comprobante.">
+<meta name="robots" content="noindex,follow"><link rel="canonical" href="https://www.kilometroinfinito.com.ar/inscribirme/">
+<meta property="og:title" content="Inscribirme | Kilómetro Infinito"><meta property="og:description" content="Inscribite en las carreras con el crono de KMI: elegís la carrera, cargás tus datos, transferís y subís el comprobante."><meta property="og:type" content="website"><meta property="og:locale" content="es_AR">
+<meta property="og:image" content="https://www.kilometroinfinito.com.ar/assets/img/largada-running-arco-rojo.webp"><meta name="theme-color" content="#0B1533">
+<link rel="icon" href="../assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/kmi.css?v=10">
+</head>
+<body>
+<a class="skip" href="#main">Saltar al contenido</a>
+<header class="bar"><div class="wrap">
+<a class="brand" href="../"><img src="../assets/img/logo-kmi.webp" width="44" height="44" alt="">Kilómetro Infinito</a>
+<button class="menu-t" aria-expanded="false">Menú</button>
+<nav class="nav" aria-label="Principal"><a href="../calendario/" aria-current="page">Calendario</a><a href="../resultados/">Resultados</a><a href="../competencias/">Competencias</a><a href="../campeonatos/">Campeonatos</a><a href="../cronometraje/">Cronometraje</a><a href="../historia/">Historia</a><a href="../fotos/">Fotos</a><a class="btn" href="../contacto/">Contacto</a></nav>
+</div></header>
+<main id="main">
+<section class="ph"><img src="../assets/img/largada-mtb-arco-negro-peloton.webp" width="1440" height="825" alt="Pelotón de mountain bike bajo el arco negro, listo para largar" class="ph-bg"><div class="wrap"><h1>Inscribirme</h1><p class="lead">Cuatro pasos y listo: carrera, tus datos, la transferencia y el comprobante.</p></div></section>
+<section class="sec"><div class="wrap"><form class="ins" id="ins" novalidate>
+<ol class="steps" aria-label="Pasos"><li class="on">Carrera</li><li>Tus datos</li><li>Pago</li><li>Comprobante</li></ol>
+
+<fieldset class="st" data-st="1"><legend>1. Carrera y categoría</legend>
+<div class="fld full"><label for="i-race">Carrera</label><select id="i-race" name="carrera"><option value="vuelta-coronel-vidal-2026">10ª Vuelta a Coronel Vidal · 22 de noviembre de 2026</option><option value="caminos-de-luna-2026">Caminos de Luna · 12 de diciembre de 2026</option></select></div>
+<div class="tool on-ink"><div data-for="vuelta-coronel-vidal-2026" hidden><div class="cp" data-cp="i-vuelta-coronel-vidal-2026" data-race="vuelta-coronel-vidal-2026">
+<p class="cp-l">1. ¿En qué te anotás?</p><div class="seg" data-k="mod"><button type="button" class="seg-b" data-v="comp" aria-pressed="false">Competitiva<span>55 km, 5 vueltas</span></button><button type="button" class="seg-b" data-v="promo" aria-pressed="false">Promocional<span>33 km, 3 vueltas</span></button><button type="button" class="seg-b" data-v="prin" aria-pressed="false">Principiante<span>11 km, 1 vuelta</span></button></div>
+<p class="cp-l">2. Rama</p><div class="seg" data-k="g"><button type="button" class="seg-b" data-v="d" aria-pressed="false">Damas</button><button type="button" class="seg-b" data-v="c" aria-pressed="false">Caballeros</button></div>
+<label class="cp-l" for="i-vuelta-coronel-vidal-2026-year">3. Año de nacimiento</label><input id="i-vuelta-coronel-vidal-2026-year" class="cp-y" type="number" inputmode="numeric" placeholder="Ej.: 1971" min="1920" max="2020">
+<div class="out cp-out" hidden aria-live="polite"></div></div></div><div data-for="caminos-de-luna-2026" hidden><div class="cp" data-cp="i-caminos-de-luna-2026" data-race="caminos-de-luna-2026">
+<p class="cp-l">1. ¿En qué te anotás?</p><div class="seg" data-k="mod"><button type="button" class="seg-b" data-v="comp" aria-pressed="false">Competitiva<span>45 km, 1 vuelta</span></button><button type="button" class="seg-b" data-v="promo" aria-pressed="false">Promocional<span>45 km, 1 vuelta</span></button></div>
+<p class="cp-l">2. Rama</p><div class="seg" data-k="g"><button type="button" class="seg-b" data-v="d" aria-pressed="false">Damas</button><button type="button" class="seg-b" data-v="c" aria-pressed="false">Caballeros</button></div>
+<label class="cp-l" for="i-caminos-de-luna-2026-year">3. Año de nacimiento</label><input id="i-caminos-de-luna-2026-year" class="cp-y" type="number" inputmode="numeric" placeholder="Ej.: 1971" min="1920" max="2020">
+<div class="out cp-out" hidden aria-live="polite"></div></div></div></div>
+<div class="nav-st"><button type="button" class="btn y" data-next>Seguir</button></div></fieldset>
+
+<fieldset class="st" data-st="2" hidden><legend>2. Tus datos</legend>
+<p class="small" id="i-recordado" hidden>Completamos tus datos de la última vez. Revisalos.</p>
+<div class="flds"><div class="fld"><label for="i-nombre">Nombre</label><input id="i-nombre" name="nombre" type="text" autocomplete="given-name" required></div><div class="fld"><label for="i-apellido">Apellido</label><input id="i-apellido" name="apellido" type="text" autocomplete="family-name" required></div>
+<div class="fld"><label for="i-dni">DNI</label><input id="i-dni" name="dni" type="text" inputmode="numeric" required></div><div class="fld"><label for="i-nac">Fecha de nacimiento</label><input id="i-nac" name="nac" type="date" required></div>
+<div class="fld"><label for="i-cel">Celular con WhatsApp</label><input id="i-cel" name="cel" type="tel" autocomplete="tel" placeholder="Ej.: 2494 551251" required></div><div class="fld"><label for="i-mail">Mail</label><input id="i-mail" name="mail" type="email" autocomplete="email" required></div>
+<div class="fld"><label for="i-ciudad">Ciudad</label><input id="i-ciudad" name="ciudad" type="text" autocomplete="address-level2" required></div><div class="fld"><label for="i-equipo">Equipo o club (si tenés)</label><input id="i-equipo" name="equipo" type="text" ></div>
+<div class="fld full"><label for="i-pareja">Si corrés en pareja o en posta: nombre y DNI de tu compañero/a</label><input id="i-pareja" name="pareja" type="text" ></div></div>
+<label class="chk"><input type="checkbox" id="i-rec" checked> Recordar mis datos en este celular para la próxima carrera</label>
+<div class="nav-st"><button type="button" class="btn line" data-prev>Volver</button><button type="button" class="btn y" data-next>Seguir</button></div></fieldset>
+
+<fieldset class="st" data-st="3" hidden><legend>3. Transferí</legend>
+<div class="pay"><p class="small">Monto de hoy</p><p class="pay-m" id="i-monto">-</p><p class="small" id="i-tramo"></p>
+<dl class="facts"><dt>Alias</dt><dd><b id="i-alias">lorem.ipsum.kmi</b> <button type="button" class="copy" data-copy="i-alias">Copiar</button></dd><dt>CBU</dt><dd><span id="i-cbu">0000000000000000000000</span> <button type="button" class="copy" data-copy="i-cbu">Copiar</button></dd><dt>Titular</dt><dd>Lorem Ipsum (a confirmar)</dd></dl>
+<p class="small">Cuando hagas la transferencia, guardá la captura del comprobante: la subís en el paso siguiente.</p></div>
+<div class="nav-st"><button type="button" class="btn line" data-prev>Volver</button><button type="button" class="btn y" data-next>Ya transferí</button></div></fieldset>
+
+<fieldset class="st" data-st="4" hidden><legend>4. Subí el comprobante</legend>
+<label class="drop" for="i-comp"><b>Tocá para elegir la foto o el PDF</b><span class="small" id="i-comp-n">La captura de la transferencia, hasta 8 MB</span></label>
+<input id="i-comp" type="file" accept="image/*,application/pdf" class="sr">
+<p class="small" style="margin-top:12px">Sin comprobante no queda hecha la preinscripción.</p>
+<div class="nav-st"><button type="button" class="btn line" data-prev>Volver</button><button type="submit" class="btn y" id="i-send">Enviar preinscripción</button></div></fieldset>
+
+<div class="st done" data-st="5" hidden tabindex="-1"><h2>Listo, recibimos tu preinscripción</h2><p id="i-res"></p><p>Revisamos el pago a mano, de lunes a viernes a las 13 y a las 20, y te confirmamos con el horario de acreditación y de largada.</p><p class="small" id="i-demo" hidden>Versión de muestra: todavía no se guarda en la planilla de KMI.</p><div class="btns" style="margin-top:20px"><a class="btn line" id="i-lista" href="#" target="_blank" rel="noopener" hidden>Ver lista de inscriptos</a><a class="btn" href="../calendario/">Volver al calendario</a></div></div>
+<p class="err" id="i-err" role="alert" hidden></p>
+</form></div></section>
+<script id="races-data" type="application/json">{"vuelta-coronel-vidal-2026": {"name": "10ª Vuelta a Coronel Vidal", "date": "2026-11-22", "tiers": [{"from": "2026-10-09", "to": "2026-10-23", "comp": 45000, "promo": 45000, "prin": 35000}, {"from": "2026-10-24", "to": "2026-11-13", "comp": 55000, "promo": 55000, "prin": 45000}, {"from": "2026-11-14", "to": "2026-11-19", "comp": 65000, "promo": 65000, "prin": 55000}], "cats": {"comp": {"d": [["Damas A", 0, 39], ["Damas B", 40, 49], ["Damas C", 50, 200]], "c": [["Elite", 18, 34], ["Master A", 35, 39], ["Master B1", 40, 44], ["Master B2", 45, 49], ["Master C1", 50, 54], ["Master C2", 55, 59], ["Master D1", 60, 64], ["Master D2", 65, 200]]}, "promo": {"d": [["Promo Damas A", 0, 39], ["Promo Damas B", 40, 49], ["Promo Damas C", 50, 200]], "c": [["Promo Caballeros A", 0, 39], ["Promo Caballeros B", 40, 49], ["Promo Caballeros C", 50, 59], ["Promo Caballeros D", 60, 200]]}, "prin": {"d": [["Damas Principiantes A", 0, 44], ["Damas Principiantes B", 45, 200]], "c": [["Caballeros Principiantes A", 0, 44], ["Caballeros Principiantes B", 45, 200]]}}, "dist": {"comp": "55 km, 5 vueltas", "promo": "33 km, 3 vueltas", "prin": "11 km, 1 vuelta"}, "insc": "https://docs.google.com/spreadsheets/d/1J_fqNHW98RiufZVscVLBkjW3DuuoN4Y32w_XckDLf6g/edit?usp=sharing", "year": 2026}, "caminos-de-luna-2026": {"name": "Caminos de Luna", "date": "2026-12-12", "tiers": [{"from": "2026-10-01", "to": "2026-10-30", "comp": 45000, "promo": 40000}, {"from": "2026-10-31", "to": "2026-11-27", "comp": 55000, "promo": 50000}, {"from": "2026-11-28", "to": "2026-12-10", "comp": 70000, "promo": 65000}], "cats": {"comp": {"d": [["Damas A", 0, 39], ["Damas B", 40, 49], ["Damas C", 50, 200]], "c": [["Elite", 18, 34], ["Master A", 35, 39], ["Master B1", 40, 44], ["Master B2", 45, 49], ["Master C1", 50, 54], ["Master C2", 55, 59], ["Master D", 60, 200]]}, "promo": {"d": [["Promo Damas A", 0, 39], ["Promo Damas B", 40, 200]], "c": [["Promo Caballeros A", 0, 39], ["Promo Caballeros B", 40, 54], ["Promo Caballeros C", 55, 200]]}}, "dist": {"comp": "45 km, 1 vuelta", "promo": "45 km, 1 vuelta"}, "insc": "", "year": 2026}}</script>
+<script id="ins-cfg" type="application/json">{"url": ""}</script>
+</main>
+<footer><div class="wrap foot-m on-ink">
+<div><a class="brand" href="../"><img src="../assets/img/logo-kmi.webp" width="58" height="58" alt="">Kilómetro Infinito</a><p>Cronometraje, clasificación y locución de carreras. Ayacucho, provincia de Buenos Aires. “Único límite, tu imaginación”.</p></div>
+<ul><li><a href="../calendario/">Calendario</a></li><li><a href="../resultados/">Resultados</a></li><li><a href="../competencias/">Competencias</a></li><li><a href="../campeonatos/">Campeonatos</a></li><li><a href="../cronometraje/">Cronometraje</a></li><li><a href="../historia/">Historia</a></li><li><a href="../fotos/">Fotos</a></li><li><a href="../inscripcion/">Cómo inscribirme</a></li><li><a href="../contacto/">Contacto</a></li><li><a href="https://www.instagram.com/kminfinito/" rel="noopener">Instagram</a></li><li><a href="mailto:kminfinito@live.com.ar">kminfinito@live.com.ar</a></li></ul>
+</div><p class="wrap credit">Sitio hecho por <a href="https://tranqueraweb.com.ar" rel="noopener">Tranquera Digital</a>.</p></footer>
+
+<script src="../assets/script.js?v=10" defer></script>
+</body></html>

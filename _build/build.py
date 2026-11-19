@@ -7,8 +7,12 @@ SITE = B.parent
 D = B / 'data'
 NOINDEX = True          # muestra: al lanzar con el dominio real, poner False
 DOMAIN = 'https://www.kilometroinfinito.com.ar'
-V = "9"
+V = "10"
 WA = '5492494551251'    # (0249) 15-455-1251, A CONFIRMAR que tenga WhatsApp
+# Inscripción: URL de la app de Google (Apps Script) de Adrián. Vacía = modo muestra (no guarda nada).
+INSC_URL = ''
+# A CONFIRMAR con Adrián: datos de la cuenta para transferir.
+PAGO = {'alias': 'lorem.ipsum.kmi', 'cbu': '0000000000000000000000', 'titular': 'Lorem Ipsum (a confirmar)'}
 FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSegLqTnWHF24_hhah0eCGhpEGIKlq71XwLnVv1Ek3I0skuifA/viewform'
 MAIL = 'kminfinito@live.com.ar'
 IG = 'https://www.instagram.com/kminfinito/'
@@ -96,6 +100,7 @@ def page(path, title, desc, body, active='', schema=None, noindex=False, sitemap
 {cta}
 <script src="{R}assets/script.js?v={V}" defer></script>
 </body></html>'''
+    doc = re.sub(r'(<a (?![^>]*target=)[^>]*href="https://docs\.google\.com[^"]*")', r'\1 target="_blank"', doc)
     f = SITE / path
     f.parent.mkdir(parents=True, exist_ok=True)
     f.write_text(doc, encoding='utf8')
@@ -112,10 +117,10 @@ def finder(pid='home', on_ink=True, label='Escribí tu nombre o apellido'):
 
 
 FAQ = [
- ('¿Cómo me inscribo en una carrera?', 'Entrás a la carrera en el calendario, completás la preinscripción y te respondemos por mail con la confirmación y el número de cuenta. Pagás, nos mandás el comprobante y recién ahí quedás anotado. Si no nos llega el comprobante por mail, no estás anotado.'),
- ('¿Cuánto tardan en responder?', 'La respuesta no es automática: contestamos de lunes a viernes, a las 13 y a las 20. Por lo general no pasan más de 24 horas. Revisá la carpeta de spam o no deseado antes de escribirnos de nuevo.'),
- ('¿Puedo anotarme por WhatsApp o por redes?', 'Hoy no tomamos inscripciones por redes ni por WhatsApp. Usá el formulario, o anotate en persona en Bikes Amigorena (Colón 7199, Mar del Plata) o con nosotros en las carreras previas.'),
- ('¿En qué categoría corro?', 'Se inscribe por año de nacimiento: se toma la edad que vas a tener al 31 de diciembre. En la página de cada carrera ponés tu año y te dice tu categoría y cuánto pagás hoy.'),
+ ('¿Cómo me inscribo en una carrera?', 'Entrás a la carrera en el calendario y tocás Inscribirme. Cargás tus datos, ves a qué cuenta transferir, pagás y subís la foto del comprobante ahí mismo. Sin comprobante no queda hecha la preinscripción. Después te confirmamos, con el horario de acreditación y de largada.'),
+ ('¿Cuándo me confirman?', 'Revisamos los pagos a mano, de lunes a viernes, a las 13 y a las 20. Por lo general no pasan más de 24 horas. Revisá también la carpeta de spam.'),
+ ('¿Puedo anotarme por WhatsApp o por redes?', 'Por redes y por WhatsApp no tomamos inscripciones. Anotate desde la página de la carrera, o anotate en persona en Bikes Amigorena (Colón 7199, Mar del Plata) o con nosotros en las carreras previas.'),
+ ('¿En qué categoría corro?', 'Se inscribe por año de nacimiento: se toma la edad que vas a tener al 31 de diciembre. En la página de cada carrera elegís la modalidad y la rama, ponés tu año y te dice tu categoría.'),
  ('Me anoté y no puedo ir. ¿Me devuelven la plata?', 'Lo que dice el reglamento de Caminos de Luna: lo abonado no se devuelve, pero se puede transferir a otra persona hasta el 4 de diciembre. Cada sede fija su regla, así que fijate en la página de tu carrera.'),
  ('¿Cuándo salen los resultados?', 'En general el mismo día de la carrera, acá en la web. Por categoría y por general. Con tu nombre también encontrás todas tus carreras anteriores.'),
  ('Quiero cronometrar mi carrera. ¿Qué hago?', 'Contanos fecha, lugar y cuántos corredores esperás, y te pasamos un presupuesto. Vas a Cronometraje, completás cuatro datos y nos llega por WhatsApp.'),
@@ -303,6 +308,16 @@ page('calendario/index.html', 'Calendario de carreras 2026 y 2027 | Kilómetro I
 
 MOD = {'comp': 'Competitiva', 'promo': 'Promocional', 'prin': 'Principiante'}
 MODS = {'comp': 'Competitivas', 'promo': 'Promocionales', 'prin': 'Principiantes'}
+
+
+def catpicker(r, p):
+    """Modalidad y rama con botones, año de nacimiento: la categoría sale sola. p = prefijo de ids."""
+    mods = ''.join(f'<button type="button" class="seg-b" data-v="{m}" aria-pressed="false">{MOD[m]}<span>{esc(r["dist"].get(m, ""))}</span></button>' for m in r['cats'])
+    return f'''<div class="cp" data-cp="{p}" data-race="{r['id']}">
+<p class="cp-l">1. ¿En qué te anotás?</p><div class="seg" data-k="mod">{mods}</div>
+<p class="cp-l">2. Rama</p><div class="seg" data-k="g"><button type="button" class="seg-b" data-v="d" aria-pressed="false">Damas</button><button type="button" class="seg-b" data-v="c" aria-pressed="false">Caballeros</button></div>
+<label class="cp-l" for="{p}-year">3. Año de nacimiento</label><input id="{p}-year" class="cp-y" type="number" inputmode="numeric" placeholder="Ej.: 1971" min="1920" max="2020">
+<div class="out cp-out" hidden aria-live="polite"></div></div>'''
 for r in RACES:
     tiers = ''
     if r['tiers']:
@@ -318,23 +333,19 @@ for r in RACES:
     sched = ''.join(f'<dt>{a}</dt><dd>{esc(b)}</dd>' for a, b in r['sched'])
     tool = ''
     if r['open']:
-        opts = ''.join(f'<option value="{m}">{MOD[m]} · {r["dist"].get(m, "")}</option>' for m in r['cats'])
         data = {k: r[k] for k in ('tiers', 'cats', 'dist')}
         data['year'] = 2026
         tool = f'''<section class="sec" id="inscripcion"><div class="wrap two">
-<div class="tool on-ink" id="catfinder"><h2>Tu categoría y cuánto pagás hoy</h2>
-<div class="tool-g"><div><label for="cf-year">Año de nacimiento</label><input id="cf-year" type="number" inputmode="numeric" placeholder="1985" min="1920" max="2020"></div>
-<div><label for="cf-g">Rama</label><select id="cf-g"><option value="c">Caballeros</option><option value="d">Damas</option></select></div>
-<div><label for="cf-mod">Modalidad</label><select id="cf-mod">{opts}</select></div></div>
-<div class="out" id="cf-out" hidden aria-live="polite"></div>
-<div class="btns" style="margin-top:20px"><a class="btn y" href="{FORM}" rel="noopener">Preinscribirme</a>{f'<a class="btn line" href="{r["insc"]}" rel="noopener">Ver inscriptos</a>' if r['insc'] else ''}</div>
-<p class="small" style="margin-top:14px">Te respondemos por mail de lunes a viernes, a las 13 y a las 20. Revisá spam.</p>
+<div class="tool on-ink" id="catfinder"><h2>Tu categoría</h2>
+{catpicker(r, 'cf')}
+<div class="btns" style="margin-top:22px"><a class="btn y" href="{{{{R}}}}inscribirme/?c={r['id']}">Inscribirme</a>{f'<a class="btn line" href="{r["insc"]}" rel="noopener">Ver lista de inscriptos</a>' if r['insc'] else ''}</div>
+<p class="small" style="margin-top:14px">Te anotás desde acá: cargás tus datos, transferís y subís el comprobante. Sin comprobante no queda hecha la preinscripción.</p>
 </div>
-<div><h2>Precios por fecha</h2>{tiers}<p style="margin-top:18px">{esc(r.get('refund', ''))}</p><p style="margin-top:10px"><b>Incluye:</b> {esc(r['incl'])}</p>{f'<p style="margin-top:10px"><b>Premios:</b> {esc(r["prizes"])}</p>' if r.get('prizes') else ''}
+<div><h2>Costo de inscripción</h2>{tiers}<p style="margin-top:18px">{esc(r.get('refund', ''))}</p><p style="margin-top:10px"><b>Incluye:</b> {esc(r['incl'])}</p>{f'<p style="margin-top:10px"><b>Premios:</b> {esc(r["prizes"])}</p>' if r.get('prizes') else ''}
 <p style="margin-top:10px"><b>En persona:</b> Bikes Amigorena, Colón 7199, Mar del Plata, o con nosotros en las carreras previas.</p></div>
 </div></section>
 <section class="sec soft"><div class="wrap"><h2>Todas las categorías</h2><p style="margin-top:8px">Edad al 31 de diciembre de 2026.</p>{cats_html}</div></section>
-<script id="race-data" type="application/json">{json.dumps(data, ensure_ascii=False)}</script>'''
+<script id="races-data" type="application/json">{json.dumps({r['id']: data}, ensure_ascii=False)}</script>'''
     elif r.get('incl'):
         tool = f'''<section class="sec"><div class="wrap two"><div><h2>Distancias</h2><div class="tiers">{''.join(f'<div class="tier"><b class="num">{v}</b><span class="small">{MOD[k]}</span></div>' for k, v in r['dist'].items())}</div><p style="margin-top:18px"><b>Incluye:</b> {esc(r['incl'])}</p>
 <div class="btns" style="margin-top:20px">{f'<a class="btn" href="{r["insc"]}" rel="noopener">Ver inscriptos</a>' if r['insc'] else ''}</div></div>{flyer(r['flyer'], r['name'])}</div></section>'''
@@ -486,9 +497,10 @@ page('campeonatos/index.html', '17° Campeonato KMI de MTB Rural | Fechas, punto
 
 # ---------------------------------------------------------------- Cronometraje (para organizadores)
 SERV = [('Cronometraje', 'Tiempo de cada corredor, por vuelta si el circuito las tiene. Rally, rural bike, contrarreloj, duatlón individual y en postas, running.'),
+        ('Cronometraje con chip', 'Cada corredor lleva su chip y el tiempo se toma solo cuando pasa por la llegada, sin anotar números a mano. Ya lo usábamos en la 3ª Vuelta a Coronel Vidal, en 2017.'),  # A CONFIRMAR: tipo de chip (dorsal, tobillera) y si da tiempo por vuelta
         ('Clasificación', 'Por categoría y general, con diferencia al primero y al de adelante, promedio y procedencia. Publicada en la web, con la URL de tu carrera para compartir.'),
         ('Locución', 'Adrián con el micrófono y el sombrero, en la largada, la llegada y la entrega de premios.'),
-        ('Inscripciones', 'Formulario, confirmación por mail, control de pagos y planilla de inscriptos a la vista. Centro de inscripción en Bikes Amigorena, Mar del Plata.'),
+        ('Inscripciones', 'El corredor se anota desde la web: carga sus datos, transfiere y sube el comprobante. Nosotros controlamos los pagos y la planilla de inscriptos queda a la vista. Centro de inscripción en Bikes Amigorena, Mar del Plata.'),
         ('Campeonato', 'Si querés, tu fecha puede sumar al Campeonato KMI, con su público fijo que viene a buscar puntos.')]
 crono = f'''<section class="ph"><div class="wrap"><h1>Cronometraje</h1><p class="lead">Para clubes, escuelas, municipios y grupos que quieren hacer su carrera bien. Llevamos 20 años y {S['events']} clasificaciones publicadas.</p><p style="margin-top:20px"><a class="btn" href="#presupuesto">Pedir presupuesto</a></p></div></section>
 <section class="sec"><div class="wrap scene"><div class="pic rv">{img('adrian-poo-sombrero-locucion')}</div><div><ul class="say" style="margin-top:-24px">{''.join(f'<li class="rv"><h3>{a}</h3><p>{b}</p></li>' for a, b in SERV)}</ul></div></div></section>
@@ -500,7 +512,7 @@ crono = f'''<section class="ph"><div class="wrap"><h1>Cronometraje</h1><p class=
 <div class="tool-g"><div><label for="b-place">Lugar</label><input id="b-place" placeholder="Localidad"></div><div><label for="b-n">Corredores estimados</label><input id="b-n" inputmode="numeric" placeholder="150"></div></div>
 <p style="margin-top:22px"><a class="btn y" id="b-send" data-wa="{WA}" href="https://wa.me/{WA}" rel="noopener">Enviar por WhatsApp</a></p>
 </form></div></section>'''
-page('cronometraje/index.html', 'Cronometraje de carreras en Buenos Aires | Pedí presupuesto a KMI', 'Cronometraje, clasificación, locución e inscripciones para carreras de MTB, duatlón y running en la provincia de Buenos Aires. 20 años de experiencia. Pedí presupuesto.', crono, 'cronometraje/')
+page('cronometraje/index.html', 'Cronometraje de carreras en Buenos Aires | Pedí presupuesto a KMI', 'Cronometraje con chip, clasificación, locución e inscripciones para carreras de MTB, duatlón y running en la provincia de Buenos Aires. 20 años de experiencia. Pedí presupuesto.', crono, 'cronometraje/')
 
 # ---------------------------------------------------------------- Historia
 hist = f'''<section class="ph"><div class="wrap"><h1>Historia</h1><p class="lead">Veinte años, contados con los números que fuimos anotando.</p></div></section>
@@ -515,17 +527,69 @@ grid = ''.join(f'<figure style="margin:0"><button data-lb="{{{{R}}}}assets/img/{
 aff = [p for p in sorted((SITE / 'assets/afiches').glob('*.webp'), reverse=True)]
 fl_meta = {f['f'][:-4]: f for f in json.load(open(B / 'raw/flyers.json', encoding='utf8'))}
 aff_html = ''.join(f'<figure style="margin:0"><button data-lb="{{{{R}}}}assets/afiches/{p.name}" aria-label="Ampliar afiche"><img src="{{{{R}}}}assets/afiches/{p.name}" alt="Afiche de {esc(re.sub(r"\s+", " ", fl_meta.get(p.stem, {}).get("t", "carrera"))[:70])}" loading="lazy" decoding="async"></button><figcaption>{p.stem[:4]}</figcaption></figure>' for p in aff)
-fotos = f'''<section class="ph"><div class="wrap"><h1>Fotos</h1><p class="lead">Una selección de nuestro Instagram. Hay {len(aff)} afiches más abajo: cada carrera tiene el suyo.</p><p style="margin-top:18px"><a class="btn" href="{IG}" rel="noopener">Más en @kminfinito</a></p></div></section>
-<section class="sec" style="padding-top:clamp(20px,3vw,40px)"><div class="wrap pgrid">{grid}</div></section>
-<section class="sec soft"><div class="wrap"><h2 style="margin-bottom:22px">El muro de los afiches</h2><div class="pgrid af">{aff_html}</div></div></section>'''
+fotos = f'''<section class="ph"><div class="wrap"><h1>Fotos</h1><p class="lead">Las fotos de cada carrera, para buscarte y bajarlas. Más abajo, lo mejor del Instagram y {len(aff)} afiches.</p><p style="margin-top:18px"><a class="btn" href="{IG}" rel="noopener">Más en @kminfinito</a></p></div></section>
+<section class="sec" id="albums" data-url="{INSC_URL}" style="padding-top:clamp(20px,3vw,40px)"><div class="wrap"><div class="sec-h"><h2>Fotos de cada carrera</h2><p>Buscate, tocá la foto y bajala.</p></div>
+<div class="albs" aria-live="polite"></div><div class="alb-view" hidden><p><button type="button" class="btn line alb-back">Todas las carreras</button></p><h3 class="alb-t"></h3><div class="pgrid alb-g"></div></div></div></section>
+<script id="albums-demo" type="application/json">{json.dumps({'nombre': 'Ejemplo: así se ve una carrera (fotos de Instagram)', 'fotos': ['{{R}}assets/img/' + n + '.webp' for n in allp]}, ensure_ascii=False)}</script>
+<section class="sec soft"><div class="wrap"><h2 style="margin-bottom:22px">Del Instagram</h2><div class="pgrid">{grid}</div></div></section>
+<section class="sec"><div class="wrap"><h2 style="margin-bottom:22px">El muro de los afiches</h2><div class="pgrid af">{aff_html}</div></div></section>'''
 page('fotos/index.html', 'Fotos y afiches de las carreras | Kilómetro Infinito', 'Fotos de largadas, barro y podios, y el archivo de afiches de las carreras cronometradas por KMI.', fotos, 'fotos/')
 
 # ---------------------------------------------------------------- Inscripción
-PASOS = [('Completá el formulario', 'Elegís la carrera en el calendario y mandás tus datos. Revisalos bien, y poné un mail que funcione.'), ('Te respondemos por mail', 'Con la confirmación y el número de cuenta. Contestamos de lunes a viernes, a las 13 y a las 20. Por lo general en menos de 24 horas.'), ('Pagá y mandá el comprobante', 'Sin comprobante por mail no estás anotado. Te avisamos cuando lo recibimos, siempre por mail.'), ('Buscate en la lista', 'La planilla de inscriptos queda a la vista en la página de la carrera.')]
-insc = f'''<section class="ph"><div class="wrap"><h1>Cómo inscribirme</h1><p class="lead">Son cuatro pasos. El precio sube por tramos, así que conviene no dejarlo para último momento.</p></div></section>
+PASOS = [('Elegí tu carrera', 'En el calendario entrás a la carrera, elegís la modalidad y la rama, ponés tu año y ves tu categoría.'), ('Cargá tus datos', 'Tocás Inscribirme y completás nombre, DNI, fecha de nacimiento, celular y mail. Si ya te anotaste antes desde el mismo celular, se completan solos.'), ('Transferí y subí el comprobante', 'Te mostramos el monto de hoy y la cuenta. Transferís y subís la foto o el PDF del comprobante. Sin comprobante no queda hecha la preinscripción.'), ('Te confirmamos', 'Revisamos el pago y te confirmamos con el horario de acreditación y de largada. Y ya aparecés en la lista de inscriptos.')]
+insc = f'''<section class="ph"><div class="wrap"><h1>Cómo inscribirme</h1><p class="lead">Son cuatro pasos y se hacen todos desde la web. El precio sube por tramos, así que conviene no dejarlo para último momento.</p></div></section>
 <section class="sec"><div class="wrap scene"><div class="pic rv">{img('corredoras-con-numero-mar-de-cobo')}</div><div><ol class="say" style="list-style:none">{''.join(f'<li class="rv"><h3>{a}</h3><p>{b}</p></li>' for a, b in PASOS)}</ol><a class="btn" href="{{{{R}}}}calendario/">Elegir carrera</a></div></div></section>
 <section class="sec soft"><div class="wrap"><h2 style="margin-bottom:20px">Preguntas</h2>{''.join(f'<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>' for q, a in FAQ)}</div></section>'''
-page('inscripcion/index.html', 'Cómo inscribirme en una carrera de KMI | Paso a paso', 'Formulario, respuesta por mail, pago y comprobante: cómo inscribirte en las carreras con el crono de Kilómetro Infinito y a quién preguntarle.', insc, schema=[faq_schema(FAQ)])
+page('inscripcion/index.html', 'Cómo inscribirme en una carrera de KMI | Paso a paso', 'Datos, transferencia y comprobante, todo desde la web: cómo inscribirte en las carreras con el crono de Kilómetro Infinito y a quién preguntarle.', insc, schema=[faq_schema(FAQ)])
+
+# ---------------------------------------------------------------- Inscribirme (formulario completo)
+OPEN = [r for r in RACES if r['open']]
+races_map = {r['id']: {'name': r['name'], 'date': r['date'], 'tiers': r['tiers'], 'cats': r['cats'], 'dist': r['dist'], 'insc': r['insc'], 'year': 2026} for r in OPEN}
+race_opts = ''.join(f'<option value="{r["id"]}">{esc(r["name"])} · {fdate(r["date"])}</option>' for r in OPEN)
+pickers = ''.join(f'<div data-for="{r["id"]}" hidden>{catpicker(r, "i-" + r["id"])}</div>' for r in OPEN)
+
+
+def fld(id_, lab, typ='text', extra='', full=False):
+    return f'<div class="fld{" full" if full else ""}"><label for="{id_}">{lab}</label><input id="{id_}" name="{id_[2:]}" type="{typ}" {extra}></div>'
+
+
+ins = f'''<section class="ph"><div class="wrap"><h1>Inscribirme</h1><p class="lead">Cuatro pasos y listo: carrera, tus datos, la transferencia y el comprobante.</p></div></section>
+<section class="sec"><div class="wrap"><form class="ins" id="ins" novalidate>
+<ol class="steps" aria-label="Pasos"><li class="on">Carrera</li><li>Tus datos</li><li>Pago</li><li>Comprobante</li></ol>
+
+<fieldset class="st" data-st="1"><legend>1. Carrera y categoría</legend>
+<div class="fld full"><label for="i-race">Carrera</label><select id="i-race" name="carrera">{race_opts}</select></div>
+<div class="tool on-ink">{pickers}</div>
+<div class="nav-st"><button type="button" class="btn y" data-next>Seguir</button></div></fieldset>
+
+<fieldset class="st" data-st="2" hidden><legend>2. Tus datos</legend>
+<p class="small" id="i-recordado" hidden>Completamos tus datos de la última vez. Revisalos.</p>
+<div class="flds">{fld('i-nombre', 'Nombre', extra='autocomplete="given-name" required')}{fld('i-apellido', 'Apellido', extra='autocomplete="family-name" required')}
+{fld('i-dni', 'DNI', extra='inputmode="numeric" required')}{fld('i-nac', 'Fecha de nacimiento', 'date', 'required')}
+{fld('i-cel', 'Celular con WhatsApp', 'tel', 'autocomplete="tel" placeholder="Ej.: 2494 551251" required')}{fld('i-mail', 'Mail', 'email', 'autocomplete="email" required')}
+{fld('i-ciudad', 'Ciudad', extra='autocomplete="address-level2" required')}{fld('i-equipo', 'Equipo o club (si tenés)')}
+{fld('i-pareja', 'Si corrés en pareja o en posta: nombre y DNI de tu compañero/a', full=True)}</div>
+<label class="chk"><input type="checkbox" id="i-rec" checked> Recordar mis datos en este celular para la próxima carrera</label>
+<div class="nav-st"><button type="button" class="btn line" data-prev>Volver</button><button type="button" class="btn y" data-next>Seguir</button></div></fieldset>
+
+<fieldset class="st" data-st="3" hidden><legend>3. Transferí</legend>
+<div class="pay"><p class="small">Monto de hoy</p><p class="pay-m" id="i-monto">-</p><p class="small" id="i-tramo"></p>
+<dl class="facts"><dt>Alias</dt><dd><b id="i-alias">{PAGO['alias']}</b> <button type="button" class="copy" data-copy="i-alias">Copiar</button></dd><dt>CBU</dt><dd><span id="i-cbu">{PAGO['cbu']}</span> <button type="button" class="copy" data-copy="i-cbu">Copiar</button></dd><dt>Titular</dt><dd>{PAGO['titular']}</dd></dl>
+<p class="small">Cuando hagas la transferencia, guardá la captura del comprobante: la subís en el paso siguiente.</p></div>
+<div class="nav-st"><button type="button" class="btn line" data-prev>Volver</button><button type="button" class="btn y" data-next>Ya transferí</button></div></fieldset>
+
+<fieldset class="st" data-st="4" hidden><legend>4. Subí el comprobante</legend>
+<label class="drop" for="i-comp"><b>Tocá para elegir la foto o el PDF</b><span class="small" id="i-comp-n">La captura de la transferencia, hasta 8 MB</span></label>
+<input id="i-comp" type="file" accept="image/*,application/pdf" class="sr">
+<p class="small" style="margin-top:12px">Sin comprobante no queda hecha la preinscripción.</p>
+<div class="nav-st"><button type="button" class="btn line" data-prev>Volver</button><button type="submit" class="btn y" id="i-send">Enviar preinscripción</button></div></fieldset>
+
+<div class="st done" data-st="5" hidden tabindex="-1"><h2>Listo, recibimos tu preinscripción</h2><p id="i-res"></p><p>Revisamos el pago a mano, de lunes a viernes a las 13 y a las 20, y te confirmamos con el horario de acreditación y de largada.</p><p class="small" id="i-demo" hidden>Versión de muestra: todavía no se guarda en la planilla de KMI.</p><div class="btns" style="margin-top:20px"><a class="btn line" id="i-lista" href="#" target="_blank" rel="noopener" hidden>Ver lista de inscriptos</a><a class="btn" href="{{{{R}}}}calendario/">Volver al calendario</a></div></div>
+<p class="err" id="i-err" role="alert" hidden></p>
+</form></div></section>
+<script id="races-data" type="application/json">{json.dumps(races_map, ensure_ascii=False)}</script>
+<script id="ins-cfg" type="application/json">{json.dumps({'url': INSC_URL}, ensure_ascii=False)}</script>'''
+page('inscribirme/index.html', 'Inscribirme | Kilómetro Infinito', 'Inscribite en las carreras con el crono de KMI: elegís la carrera, cargás tus datos, transferís y subís el comprobante.', ins, 'calendario/', noindex=True, sitemap=False, fab=False)
 
 # ---------------------------------------------------------------- Contacto
 cont = f'''<section class="ph"><div class="wrap"><h1>Contacto</h1><p class="lead">Adrián Eduardo Poó, Ayacucho, provincia de Buenos Aires.</p></div></section>

@@ -140,28 +140,171 @@
     [q, y, d, p].forEach(x => x.addEventListener('input', run));
   }
 
-  // Tu categoría y cuánto pagás hoy
-  const cf = $('#catfinder');
-  if (cf) {
-    const race = JSON.parse($('#race-data').textContent);
-    const by = $('#cf-year'), g = $('#cf-g'), mod = $('#cf-mod'), out = $('#cf-out');
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const tier = race.tiers.find(t => today <= new Date(t.to + 'T23:59:00') && today >= new Date(t.from + 'T00:00:00'));
-    $$('.tier').forEach(el => { const to = new Date(el.dataset.to + 'T23:59:00'), fr = new Date(el.dataset.from + 'T00:00:00'); if (today > to) el.classList.add('past'); else if (today >= fr) el.classList.add('now'); });
-    const calc = () => {
-      const y = parseInt(by.value, 10);
-      if (!y || y < 1920 || y > 2020) { out.hidden = true; return; }
-      const age = race.year - y;
-      const list = (race.cats[mod.value] || {})[g.value] || [];
-      const c = list.find(c => age >= (c[1] ?? 0) && age <= (c[2] ?? 200));
+  // Tu categoría: modalidad y rama con botones + año de nacimiento
+  const rdEl = $('#races-data');
+  const RACES = rdEl ? JSON.parse(rdEl.textContent) : {};
+  const catOf = (race, mod, g, y) => {
+    const age = race.year - y;
+    const list = ((race.cats[mod] || {})[g]) || [];
+    return { age, c: list.find(c => age >= (c[1] ?? 0) && age <= (c[2] ?? 200)) };
+  };
+  const pickState = new Map();
+  $$('.cp').forEach(cp => {
+    const race = RACES[cp.dataset.race]; if (!race) return;
+    const st = { mod: '', g: '', y: 0, cat: '' }; pickState.set(cp, st);
+    const out = $('.cp-out', cp), yr = $('.cp-y', cp);
+    const run = () => {
+      const ok = st.mod && st.g && st.y >= 1920 && st.y <= 2020;
+      st.cat = '';
+      if (!ok) { out.hidden = !(st.y && (st.y < 1920 || st.y > 2020)); if (!out.hidden) out.innerHTML = '<p>Revisá el año: tiene que tener 4 números, por ejemplo 1971.</p>'; return; }
+      const { age, c } = catOf(race, st.mod, st.g, st.y);
       out.hidden = false;
       if (!c) { out.innerHTML = `<b class="big">Consultanos</b><p>Con ${age} años al 31/12 no entrás en las categorías publicadas de esta modalidad. Escribinos y lo vemos.</p>`; return; }
-      const price = tier ? tier[mod.value] : null;
-      const next = tier ? race.tiers[race.tiers.indexOf(tier) + 1] : null;
-      out.innerHTML = `<b class="big">${esc(c[0])}</b><p>${age} años al 31 de diciembre · ${race.dist[mod.value] || ''}</p>` +
-        (price ? `<p class="price">Hoy pagás ${pesos(price)}</p>${next ? `<p>Hasta el ${fecha(tier.to)}. Desde el día siguiente sube a ${pesos(next[mod.value])}.</p>` : `<p>Último tramo: cierra el ${fecha(tier.to)}.</p>`}` : `<p class="price">${race.closed || 'La inscripción no está abierta hoy.'}</p>`);
+      st.cat = c[0];
+      out.innerHTML = `<b class="big">${esc(c[0])}</b><p>${age} años al 31 de diciembre · ${esc(race.dist[st.mod] || '')}</p>`;
     };
-    [by, g, mod].forEach(x => x.addEventListener('input', calc));
+    $$('.seg', cp).forEach(seg => seg.addEventListener('click', e => {
+      const b = e.target.closest('.seg-b'); if (!b) return;
+      $$('.seg-b', seg).forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+      st[seg.dataset.k] = b.dataset.v; run(); cp.dispatchEvent(new Event('cpchange'));
+    }));
+    yr.addEventListener('input', () => { st.y = parseInt(yr.value, 10) || 0; run(); cp.dispatchEvent(new Event('cpchange')); });
+    // si viene ?mod=&g=&y= (desde la página de la carrera), se completa solo
+    const q = new URLSearchParams(location.search);
+    if (q.get('c') === cp.dataset.race) {
+      ['mod', 'g'].forEach(k => { const b = $(`.seg[data-k="${k}"] .seg-b[data-v="${q.get(k)}"]`, cp); if (b) b.click(); });
+      if (q.get('y')) { yr.value = q.get('y'); yr.dispatchEvent(new Event('input')); }
+    }
+  });
+  // En la página de la carrera, "Inscribirme" lleva lo que ya eligió
+  const cf = $('#catfinder');
+  if (cf) {
+    const cp = $('.cp', cf), go = $('.btn.y', cf), base = go.getAttribute('href');
+    cp.addEventListener('cpchange', () => { const s = pickState.get(cp); const u = new URLSearchParams(base.split('?')[1]); if (s.mod) u.set('mod', s.mod); if (s.g) u.set('g', s.g); if (s.y) u.set('y', s.y); go.href = base.split('?')[0] + '?' + u; });
+  }
+
+  // Inscripción completa: carrera, datos, pago, comprobante
+  const ins = $('#ins');
+  if (ins) {
+    const cfg = JSON.parse($('#ins-cfg').textContent);
+    const sel = $('#i-race'), err = $('#i-err'), steps = $$('.steps li', ins);
+    const q = new URLSearchParams(location.search);
+    if (q.get('c') && RACES[q.get('c')]) sel.value = q.get('c');
+    const showRace = () => $$('[data-for]', ins).forEach(d => { d.hidden = d.dataset.for !== sel.value; });
+    sel.addEventListener('change', showRace); showRace();
+    const curPick = () => pickState.get($(`[data-for="${sel.value}"] .cp`, ins));
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const tierOf = race => race.tiers.find(t => today <= new Date(t.to + 'T23:59:00') && today >= new Date(t.from + 'T00:00:00'));
+    const F = ['nombre', 'apellido', 'dni', 'nac', 'cel', 'mail', 'ciudad', 'equipo', 'pareja'];
+    const KEY = 'kmi-corredor';
+    try { const saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved) { F.forEach(k => { if (saved[k]) $('#i-' + k).value = saved[k]; }); $('#i-recordado').hidden = false; } } catch (e) {}
+    let n = 1;
+    const say = m => { err.textContent = m; err.hidden = !m; };
+    const go = k => {
+      n = k; $$('.st', ins).forEach(f => { f.hidden = +f.dataset.st !== n; });
+      steps.forEach((li, i) => { li.classList.toggle('on', i === n - 1); li.classList.toggle('ok', i < n - 1); });
+      say(''); const t = $(`.st[data-st="${n}"]`, ins); ins.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const f = $('input,select,button', t); if (f && n > 1) f.focus({ preventScroll: true });
+    };
+    const check = () => {
+      if (n === 1) {
+        const s = curPick(), race = RACES[sel.value];
+        if (!s || !s.mod) return 'Elegí en qué te anotás: Competitiva, Promocional o Principiantes.';
+        if (!s.g) return 'Elegí Damas o Caballeros.';
+        if (!s.cat) return 'Poné tu año de nacimiento (4 números) para ver tu categoría.';
+        if (!tierOf(race)) return 'La inscripción de esta carrera no está abierta hoy. Escribinos y lo vemos.';
+      }
+      if (n === 2) {
+        for (const k of ['nombre', 'apellido', 'dni', 'nac', 'cel', 'mail', 'ciudad']) { const el = $('#i-' + k); if (!el.value.trim()) { el.focus(); return 'Falta completar: ' + el.labels[0].textContent + '.'; } }
+        if (!/^\d{7,8}$/.test($('#i-dni').value.replace(/\D/g, ''))) return 'Revisá el DNI: van 7 u 8 números, sin puntos.';
+        if (!$('#i-mail').checkValidity()) return 'Revisá el mail.';
+        const y = +$('#i-nac').value.slice(0, 4); if (y !== curPick().y) return `La fecha de nacimiento dice ${y || '-'} y arriba elegiste ${curPick().y}. Revisá cuál es.`;
+      }
+      return '';
+    };
+    const fillPay = () => {
+      const race = RACES[sel.value], s = curPick(), t = tierOf(race), i = race.tiers.indexOf(t), nx = race.tiers[i + 1];
+      $('#i-monto').textContent = pesos(t[s.mod]);
+      $('#i-tramo').textContent = `${race.name} · ${s.cat}. Este precio vale hasta el ${fecha(t.to)}` + (nx ? `; desde el día siguiente es ${pesos(nx[s.mod])}.` : '.');
+    };
+    ins.addEventListener('click', e => {
+      if (e.target.closest('[data-next]')) { const m = check(); if (m) return say(m); if (n === 2) fillPay(); go(n + 1); }
+      if (e.target.closest('[data-prev]')) go(n - 1);
+      const cp = e.target.closest('.copy'); if (cp) { navigator.clipboard?.writeText($('#' + cp.dataset.copy).textContent.trim()); cp.textContent = 'Copiado'; setTimeout(() => { cp.textContent = 'Copiar'; }, 1600); }
+    });
+    if (q.get('mod') && q.get('g') && q.get('y')) { const m = check(); if (!m) go(2); }
+    const comp = $('#i-comp');
+    comp.addEventListener('change', () => { const f = comp.files[0]; $('#i-comp-n').textContent = f ? `${f.name} · ${(f.size / 1048576).toFixed(1)} MB` : 'La captura de la transferencia, hasta 8 MB'; $('.drop', ins).classList.toggle('has', !!f); say(''); });
+    // Achica las fotos antes de mandarlas (los PDF van como están)
+    const toData = f => new Promise((ok, no) => {
+      const rd = new FileReader(); rd.onerror = no;
+      if (!f.type.startsWith('image/')) { rd.onload = () => ok({ name: f.name, type: f.type, data: rd.result.split(',')[1] }); return rd.readAsDataURL(f); }
+      rd.onload = () => { const im = new Image(); im.onerror = () => ok({ name: f.name, type: f.type, data: rd.result.split(',')[1] }); im.onload = () => {
+        const k = Math.min(1, 1600 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k);
+        c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); ok({ name: f.name.replace(/\.\w+$/, '') + '.jpg', type: 'image/jpeg', data: c.toDataURL('image/jpeg', 0.82).split(',')[1] });
+      }; im.src = rd.result; }; rd.readAsDataURL(f);
+    });
+    ins.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (n !== 4) return;
+      const f = comp.files[0];
+      if (!f) return say('Falta el comprobante: sin comprobante no queda hecha la preinscripción.');
+      if (f.size > 8 * 1048576) return say('El archivo pesa más de 8 MB. Mandá una captura de pantalla del comprobante.');
+      const race = RACES[sel.value], s = curPick(), t = tierOf(race);
+      const d = Object.fromEntries(F.map(k => [k, $('#i-' + k).value.trim()]));
+      try { if ($('#i-rec').checked) localStorage.setItem(KEY, JSON.stringify(d)); else localStorage.removeItem(KEY); } catch (er) {}
+      const btn = $('#i-send'); btn.disabled = true; btn.textContent = 'Enviando…';
+      try {
+        if (cfg.url) {
+          const body = { carrera: race.name, carreraId: sel.value, modalidad: s.mod, rama: s.g === 'd' ? 'Damas' : 'Caballeros', categoria: s.cat, monto: t[s.mod], ...d, comprobante: await toData(f) };
+          const r = await fetch(cfg.url, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+          const j = await r.json(); if (!j.ok) throw new Error(j.error || 'error');
+        } else { await toData(f); $('#i-demo').hidden = false; }
+        $('#i-res').textContent = `${d.nombre} ${d.apellido}, ${s.cat} en ${race.name}.`;
+        if (race.insc) { const l = $('#i-lista'); l.href = race.insc; l.hidden = false; }
+        go(5); $('.steps', ins).hidden = true;
+      } catch (er) {
+        say('No se pudo enviar. Revisá la conexión y probá de nuevo. Si sigue sin andar, escribinos a kminfinito@live.com.ar.');
+      } finally { btn.disabled = false; btn.textContent = 'Enviar preinscripción'; }
+    });
+  }
+
+  // Fotos de cada carrera: salen de las carpetas de Drive de Adrián (o un ejemplo, si todavía no está conectado)
+  const alb = $('#albums');
+  if (alb) {
+    const url = alb.dataset.url, list = $('.albs', alb), view = $('.alb-view', alb), grid = $('.alb-g', alb);
+    const demo = JSON.parse($('#albums-demo').textContent);
+    const th = (id, w) => `https://drive.google.com/thumbnail?id=${encodeURIComponent(id)}&sz=w${w}`;
+    const lb = document.createElement('figure'); lb.className = 'lb'; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true'); lb.setAttribute('aria-label', 'Foto ampliada');
+    lb.innerHTML = '<img alt=""><figcaption><a class="btn y dl" target="_blank" rel="noopener">Bajar la foto</a></figcaption><button class="x" aria-label="Cerrar">×</button><button class="p" aria-label="Anterior">‹</button><button class="n" aria-label="Siguiente">›</button>';
+    document.body.append(lb);
+    let fotos = [], k = 0, last;
+    const big = f => f.full, show = j => { k = (j + fotos.length) % fotos.length; $('img', lb).src = big(fotos[k]); $('.dl', lb).href = fotos[k].dl; };
+    const close = () => { lb.classList.remove('open'); last?.focus(); };
+    $('.x', lb).onclick = close; $('.p', lb).onclick = () => show(k - 1); $('.n', lb).onclick = () => show(k + 1);
+    lb.addEventListener('click', e => { if (e.target === lb) close(); });
+    document.addEventListener('keydown', e => { if (!lb.classList.contains('open')) return; if (e.key === 'Escape') close(); if (e.key === 'ArrowLeft') show(k - 1); if (e.key === 'ArrowRight') show(k + 1); });
+    const open = (nombre, fs) => {
+      fotos = fs; list.hidden = true; view.hidden = false; $('.alb-t', view).textContent = nombre;
+      grid.innerHTML = fs.map((f, j) => `<figure style="margin:0"><button data-j="${j}" aria-label="Ampliar foto ${j + 1}"><img src="${esc(f.small)}" alt="Foto ${j + 1} de ${esc(nombre)}" loading="lazy" decoding="async"></button></figure>`).join('');
+      view.scrollIntoView({ block: 'start' });
+    };
+    grid.addEventListener('click', e => { const b = e.target.closest('[data-j]'); if (!b) return; last = b; show(+b.dataset.j); lb.classList.add('open'); $('.x', lb).focus(); });
+    $('.alb-back', view).onclick = () => { view.hidden = true; list.hidden = false; };
+    const card = (nombre, n, tapa, act) => `<button type="button" class="alb" data-act="${esc(act)}"><img src="${esc(tapa)}" alt="" loading="lazy"><b>${esc(nombre)}</b><span class="small">${n} fotos</span></button>`;
+    if (!url) {
+      const fs = demo.fotos.map(u => ({ small: u, full: u, dl: u }));
+      list.innerHTML = card(demo.nombre, fs.length, fs[0].small, 'demo');
+      list.onclick = e => { if (e.target.closest('.alb')) open(demo.nombre, fs); };
+    } else {
+      list.innerHTML = '<p>Cargando las carreras…</p>';
+      fetch(url + '?fotos=lista').then(r => r.json()).then(al => {
+        if (!al.length) { list.innerHTML = '<p>Todavía no hay fotos cargadas.</p>'; return; }
+        list.innerHTML = al.map(a => card(a.nombre, a.n, th(a.tapa, 600), a.id)).join('');
+        list.onclick = e => { const b = e.target.closest('.alb'); if (!b) return; b.disabled = true;
+          fetch(url + '?fotos=' + encodeURIComponent(b.dataset.act)).then(r => r.json()).then(d => open(d.nombre, d.fotos.map(id => ({ small: th(id, 600), full: th(id, 1600), dl: 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(id) })))).finally(() => { b.disabled = false; }); };
+      }).catch(() => { list.innerHTML = '<p>No pudimos cargar las fotos. Probá de nuevo en un rato.</p>'; });
+    }
   }
 
   // Presupuesto por WhatsApp
