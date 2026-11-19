@@ -12,6 +12,17 @@ Todo queda en la cuenta de Google de **Adrián**: la planilla, los comprobantes 
 5. Google le pide permiso para usar su Drive y su planilla: lo acepta **él**.
 6. Copia la **URL de la aplicación web** (termina en `/exec`) y te la pasa.
 
+## 1b. Carreras con planilla del organizador (opcional)
+Hoy, cuando el organizador también anota gente, Adrián le arma una planilla de Drive, le pasa el link y después la baja. Eso sigue igual:
+1. En "KMI - Preinscripciones" aparece sola la pestaña **Carreras**.
+2. En la columna A pone el nombre de la carrera tal cual sale en la web (por ejemplo `Caminos de Luna`) y en la B, el link de la planilla que comparte con ese organizador.
+3. Desde ese momento, los que se anotan por la web caen en esa misma planilla, en una pestaña aparte llamada **"Inscriptos por la web"**. Así no se mezclan con las columnas del organizador, y Adrián baja todo de un solo lugar.
+4. Si una carrera no está en la lista, las inscripciones van a "KMI - Preinscripciones", a una pestaña con el nombre de la carrera.
+
+Ojo: el organizador va a ver los datos de los inscriptos por la web (DNI, celular). El comprobante queda en el Drive de Adrián, y el organizador solo lo puede abrir si Adrián le da permiso.
+
+Cada vez que alguien se anota por la web, a Adrián le llega un **mail de aviso** con los datos y el link al comprobante (se apaga poniendo `AVISAR_POR_MAIL = false`).
+
 ## 2. En la web (lo hago yo)
 - Pego la URL en `_build/build.py`, en `INSC_URL`, y pongo el alias, el CBU y el titular reales en `PAGO`.
 - Regenero la web y pruebo una inscripción de punta a punta.

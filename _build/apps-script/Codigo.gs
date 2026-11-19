@@ -2,9 +2,10 @@
  * Kilómetro Infinito: inscripciones y fotos de la web.
  * Se pega en una planilla de Google de Adrián (Extensiones > Apps Script) y se publica como "App web".
  * Hace dos cosas:
- *  1. Recibe cada preinscripción de la web: guarda el comprobante en Drive y agrega una fila a la planilla.
+ *  1. Recibe cada preinscripción de la web: guarda el comprobante en Drive, agrega una fila a la planilla
+ *     de esa carrera (la de Adrián o la que comparte con el organizador) y le avisa a Adrián por mail.
  *  2. Le pasa a la web la lista de fotos de cada carrera, sacada de una carpeta de Drive.
- * No manda mails ni confirma pagos: eso lo sigue haciendo Adrián.
+ * No confirma pagos ni le escribe al corredor: eso lo sigue haciendo Adrián.
  */
 
 const CARPETA_COMPROBANTES = 'KMI - Comprobantes';
@@ -15,6 +16,25 @@ const COLUMNAS = ['Fecha', 'Estado', 'Apellido', 'Nombre', 'DNI', 'Nacimiento', 
 function carpeta_(nombre, padre) {
   const it = padre ? padre.getFoldersByName(nombre) : DriveApp.getFoldersByName(nombre);
   return it.hasNext() ? it.next() : (padre ? padre.createFolder(nombre) : DriveApp.createFolder(nombre));
+}
+
+const AVISAR_POR_MAIL = true;
+
+// Pestaña "Carreras" de esta planilla: columna A = nombre de la carrera tal cual sale en la web,
+// columna B = link de la planilla de esa carrera (la que comparte con el organizador). Se crea sola.
+function planillaDe_(carrera) {
+  const libro = SpreadsheetApp.getActiveSpreadsheet();
+  let t = libro.getSheetByName('Carreras');
+  if (!t) {
+    t = libro.insertSheet('Carreras', 0);
+    t.appendRow(['Carrera (tal cual sale en la web)', 'Link de la planilla de esa carrera (opcional)']);
+    t.setFrozenRows(1); t.getRange(1, 1, 1, 2).setFontWeight('bold');
+    return '';
+  }
+  const filas = t.getDataRange().getValues().slice(1);
+  const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\s+/g, ' ').trim();
+  const f = filas.find(r => norm(r[0]) === norm(carrera) && /^https:\/\/docs\.google\.com\/spreadsheets\//.test(String(r[1]).trim()));
+  return f ? String(f[1]).trim() : '';
 }
 
 function json_(obj) {
@@ -44,9 +64,13 @@ function doPost(e) {
     const dir = carpeta_(texto_(d.carrera, 80), carpeta_(CARPETA_COMPROBANTES));
     const archivo = dir.createFile(Utilities.newBlob(bytes, tipo, nombreArchivo));
 
-    // Una pestaña por carrera
-    const libro = SpreadsheetApp.getActiveSpreadsheet();
-    const nombreHoja = texto_(d.carrera, 90);
+    // ¿Dónde se anota? Si en la pestaña "Carreras" Adrián puso el link de la planilla de esa carrera
+    // (la misma que comparte con el organizador), va ahí, a una pestaña "Inscriptos por la web".
+    // Si no, va a esta planilla, a una pestaña con el nombre de la carrera.
+    const carrera = texto_(d.carrera, 90);
+    const destino = planillaDe_(carrera);
+    const libro = destino ? SpreadsheetApp.openByUrl(destino) : SpreadsheetApp.getActiveSpreadsheet();
+    const nombreHoja = destino ? 'Inscriptos por la web' : carrera;
     let hoja = libro.getSheetByName(nombreHoja);
     if (!hoja) {
       hoja = libro.insertSheet(nombreHoja);
@@ -54,11 +78,20 @@ function doPost(e) {
       hoja.setFrozenRows(1);
       hoja.getRange(1, 1, 1, COLUMNAS.length).setFontWeight('bold');
     }
-    hoja.appendRow([
+    const fila = [
       new Date(), 'Pendiente', texto_(d.apellido, 60), texto_(d.nombre, 60), dni, texto_(d.nac, 10), texto_(d.rama, 12),
       texto_(d.modalidad, 12), texto_(d.categoria, 40), Number(d.monto) || '', texto_(d.cel, 30), texto_(d.mail, 80),
       texto_(d.ciudad, 60), texto_(d.equipo, 60), texto_(d.pareja, 120), archivo.getUrl()
-    ]);
+    ];
+    hoja.appendRow(fila);
+
+    // Aviso por mail a Adrián (a la cuenta de Google donde está instalado esto)
+    if (AVISAR_POR_MAIL) {
+      try {
+        MailApp.sendEmail(Session.getEffectiveUser().getEmail(), `Nueva preinscripción: ${fila[2]} ${fila[3]} · ${carrera}`,
+          `${fila[2]} ${fila[3]} (DNI ${dni}) se preinscribió desde la web en ${carrera}.\n${fila[8]} · $ ${fila[9]}\nCelular: ${fila[10]} · Mail: ${fila[11]}\n\nComprobante: ${fila[15]}\nPlanilla: ${libro.getUrl()}`);
+      } catch (e2) { /* si se pasa del límite diario de mails, la inscripción igual queda guardada */ }
+    }
     return json_({ ok: true });
   } catch (err) {
     return json_({ ok: false, error: 'No se pudo guardar' });
