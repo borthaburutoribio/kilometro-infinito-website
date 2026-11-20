@@ -544,6 +544,22 @@ page('inscripcion/index.html', 'Cómo inscribirme en una carrera de KMI | Paso a
 
 # ---------------------------------------------------------------- Inscribirme (formulario completo)
 OPEN = [r for r in RACES if r['open']]
+
+# Lista de carreras para el bot de WhatsApp: la lee sola, así su prompt no se toca nunca.
+_MODN = {'comp': 'competitiva', 'promo': 'promocional', 'prin': 'principiante'}
+_bot = {'actualizado': datetime.date.today().isoformat(), 'anio_referencia': 2026, 'carreras': [{
+    'id': r['id'], 'nombre': r['name'], 'fecha': r['date'], 'lugar': r['place'], 'sede': r.get('venue', ''), 'mapa': r.get('map', ''),
+    'tipo': r['mode'], 'estado': r['status'], 'inscripcion_abierta': r['open'],
+    'cierre_inscripcion': r['tiers'][-1]['to'] if r['tiers'] else '',
+    'horarios': [f'{a}: {b}' for a, b in r['sched']], 'distancias': {_MODN[k]: v for k, v in r['dist'].items()},
+    'campeonato': r.get('champ', ''), 'incluye': r.get('incl', ''), 'organiza': r.get('org', ''), 'info': r.get('info', ''),
+    'link': f'calendario/{r["id"]}/', 'inscribirme': f'inscribirme/?c={r["id"]}' if r['open'] else '', 'lista_inscriptos': r.get('insc', ''),
+    'tramos': [{'desde': t['from'], 'hasta': t['to'], **{_MODN[k]: v for k, v in t.items() if k in _MODN}} for t in r['tiers']],
+    'categorias': {_MODN[m]: {'damas': g.get('d', []), 'caballeros': g.get('c', [])} for m, g in r['cats'].items()},
+} for r in RACES]}
+(SITE / 'assets/data').mkdir(parents=True, exist_ok=True)
+json.dump(_bot, open(SITE / 'assets/data/carreras.json', 'w', encoding='utf8'), ensure_ascii=False, indent=1)
+
 races_map = {r['id']: {'name': r['name'], 'date': r['date'], 'tiers': r['tiers'], 'cats': r['cats'], 'dist': r['dist'], 'insc': r['insc'], 'year': 2026} for r in OPEN}
 race_opts = ''.join(f'<option value="{r["id"]}">{esc(r["name"])} · {fdate(r["date"])}</option>' for r in OPEN)
 pickers = ''.join(f'<div data-for="{r["id"]}" hidden>{catpicker(r, "i-" + r["id"])}</div>' for r in OPEN)

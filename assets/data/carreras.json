@@ -1,0 +1,399 @@
+{
+ "actualizado": "2026-11-20",
+ "anio_referencia": 2026,
+ "carreras": [
+  {
+   "id": "rural-bike-mechongue-2026",
+   "nombre": "6º Rural Bike Mechongué",
+   "fecha": "2026-11-08",
+   "lugar": "Mechongué",
+   "sede": "Plaza Carmelo Pepi, calle 1 entre 2 y 4",
+   "mapa": "",
+   "tipo": "Rural bike",
+   "estado": "Inscripción cerrada: estamos viendo si hay cupos nuevos",
+   "inscripcion_abierta": false,
+   "cierre_inscripcion": "",
+   "horarios": [
+    "8.30 hs: Acreditación"
+   ],
+   "distancias": {
+    "competitiva": "48 km",
+    "promocional": "32 km",
+    "principiante": "16 km"
+   },
+   "campeonato": "Anteúltima fecha del 17° Campeonato KMI",
+   "incluye": "Medalla finisher para todos, kit del corredor, seguro y servicio de cantina.",
+   "organiza": "Asociación del Centro Educativo para la Producción Total N° 20, a total beneficio del centro",
+   "info": "",
+   "link": "calendario/rural-bike-mechongue-2026/",
+   "inscribirme": "",
+   "lista_inscriptos": "https://docs.google.com/spreadsheets/d/1nuTqwbSyVvKa_WkzPPh1Cq1m7bR_6Qp15irRmW84af8/edit?gid=0#gid=0",
+   "tramos": [],
+   "categorias": {}
+  },
+  {
+   "id": "vuelta-coronel-vidal-2026",
+   "nombre": "10ª Vuelta a Coronel Vidal",
+   "fecha": "2026-11-22",
+   "lugar": "Coronel Vidal",
+   "sede": "Esc. de Educ. Sec. Agraria N° 1 “Nicanor Ezeyza”, Ruta 55 a 6 km de Ruta 2",
+   "mapa": "https://maps.app.goo.gl/WsZnd6WXckutcfvc6",
+   "tipo": "Rally bike",
+   "estado": "Inscripción abierta hasta el 19 de noviembre o hasta completar el cupo",
+   "inscripcion_abierta": true,
+   "cierre_inscripcion": "2026-11-19",
+   "horarios": [
+    "8.30 a 10 hs: Acreditación en el predio de la Escuela Agraria",
+    "11 hs: Largadas por categorías"
+   ],
+   "distancias": {
+    "competitiva": "55 km, 5 vueltas",
+    "promocional": "33 km, 3 vueltas",
+    "principiante": "11 km, 1 vuelta"
+   },
+   "campeonato": "Final del 17° Campeonato KMI “Copa Bikes Amigorena”",
+   "incluye": "Kit del corredor, medalla finisher, asistencia sanitaria, derecho a participar, clasificación y sorteos de sponsors. Hay cantina.",
+   "organiza": "",
+   "info": "223 456-7368 (Fernando)",
+   "link": "calendario/vuelta-coronel-vidal-2026/",
+   "inscribirme": "inscribirme/?c=vuelta-coronel-vidal-2026",
+   "lista_inscriptos": "https://docs.google.com/spreadsheets/d/1J_fqNHW98RiufZVscVLBkjW3DuuoN4Y32w_XckDLf6g/edit?usp=sharing",
+   "tramos": [
+    {
+     "desde": "2026-10-09",
+     "hasta": "2026-10-23",
+     "competitiva": 45000,
+     "promocional": 45000,
+     "principiante": 35000
+    },
+    {
+     "desde": "2026-10-24",
+     "hasta": "2026-11-13",
+     "competitiva": 55000,
+     "promocional": 55000,
+     "principiante": 45000
+    },
+    {
+     "desde": "2026-11-14",
+     "hasta": "2026-11-19",
+     "competitiva": 65000,
+     "promocional": 65000,
+     "principiante": 55000
+    }
+   ],
+   "categorias": {
+    "competitiva": {
+     "damas": [
+      [
+       "Damas A",
+       0,
+       39
+      ],
+      [
+       "Damas B",
+       40,
+       49
+      ],
+      [
+       "Damas C",
+       50,
+       200
+      ]
+     ],
+     "caballeros": [
+      [
+       "Elite",
+       18,
+       34
+      ],
+      [
+       "Master A",
+       35,
+       39
+      ],
+      [
+       "Master B1",
+       40,
+       44
+      ],
+      [
+       "Master B2",
+       45,
+       49
+      ],
+      [
+       "Master C1",
+       50,
+       54
+      ],
+      [
+       "Master C2",
+       55,
+       59
+      ],
+      [
+       "Master D1",
+       60,
+       64
+      ],
+      [
+       "Master D2",
+       65,
+       200
+      ]
+     ]
+    },
+    "promocional": {
+     "damas": [
+      [
+       "Promo Damas A",
+       0,
+       39
+      ],
+      [
+       "Promo Damas B",
+       40,
+       49
+      ],
+      [
+       "Promo Damas C",
+       50,
+       200
+      ]
+     ],
+     "caballeros": [
+      [
+       "Promo Caballeros A",
+       0,
+       39
+      ],
+      [
+       "Promo Caballeros B",
+       40,
+       49
+      ],
+      [
+       "Promo Caballeros C",
+       50,
+       59
+      ],
+      [
+       "Promo Caballeros D",
+       60,
+       200
+      ]
+     ]
+    },
+    "principiante": {
+     "damas": [
+      [
+       "Damas Principiantes A",
+       0,
+       44
+      ],
+      [
+       "Damas Principiantes B",
+       45,
+       200
+      ]
+     ],
+     "caballeros": [
+      [
+       "Caballeros Principiantes A",
+       0,
+       44
+      ],
+      [
+       "Caballeros Principiantes B",
+       45,
+       200
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "id": "caminos-de-luna-2026",
+   "nombre": "Caminos de Luna",
+   "fecha": "2026-12-12",
+   "lugar": "Ayacucho",
+   "sede": "Cicles Club Ayacucho, Moreno esquina Arenales",
+   "mapa": "https://maps.app.goo.gl/GJ5sBAbbQz1abSqG6",
+   "tipo": "1° Rural Bike Nocturno, contrarreloj individual",
+   "estado": "Inscripción abierta hasta el 10 de diciembre",
+   "inscripcion_abierta": true,
+   "cierre_inscripcion": "2026-12-10",
+   "horarios": [
+    "18 a 20 hs: Acreditación",
+    "20.30 hs: Inicio de la competencia",
+    "22.30 hs aprox.: Premiación"
+   ],
+   "distancias": {
+    "competitiva": "45 km, 1 vuelta",
+    "promocional": "45 km, 1 vuelta"
+   },
+   "campeonato": "",
+   "incluye": "Kit del corredor, seguro, placa, asistencia sanitaria y clasificación. Hay cantina.",
+   "organiza": "Cicles Club Ayacucho",
+   "info": "2296-406020 (Ricardo)",
+   "link": "calendario/caminos-de-luna-2026/",
+   "inscribirme": "inscribirme/?c=caminos-de-luna-2026",
+   "lista_inscriptos": "",
+   "tramos": [
+    {
+     "desde": "2026-10-01",
+     "hasta": "2026-10-30",
+     "competitiva": 45000,
+     "promocional": 40000
+    },
+    {
+     "desde": "2026-10-31",
+     "hasta": "2026-11-27",
+     "competitiva": 55000,
+     "promocional": 50000
+    },
+    {
+     "desde": "2026-11-28",
+     "hasta": "2026-12-10",
+     "competitiva": 70000,
+     "promocional": 65000
+    }
+   ],
+   "categorias": {
+    "competitiva": {
+     "damas": [
+      [
+       "Damas A",
+       0,
+       39
+      ],
+      [
+       "Damas B",
+       40,
+       49
+      ],
+      [
+       "Damas C",
+       50,
+       200
+      ]
+     ],
+     "caballeros": [
+      [
+       "Elite",
+       18,
+       34
+      ],
+      [
+       "Master A",
+       35,
+       39
+      ],
+      [
+       "Master B1",
+       40,
+       44
+      ],
+      [
+       "Master B2",
+       45,
+       49
+      ],
+      [
+       "Master C1",
+       50,
+       54
+      ],
+      [
+       "Master C2",
+       55,
+       59
+      ],
+      [
+       "Master D",
+       60,
+       200
+      ]
+     ]
+    },
+    "promocional": {
+     "damas": [
+      [
+       "Promo Damas A",
+       0,
+       39
+      ],
+      [
+       "Promo Damas B",
+       40,
+       200
+      ]
+     ],
+     "caballeros": [
+      [
+       "Promo Caballeros A",
+       0,
+       39
+      ],
+      [
+       "Promo Caballeros B",
+       40,
+       54
+      ],
+      [
+       "Promo Caballeros C",
+       55,
+       200
+      ]
+     ]
+    }
+   }
+  },
+  {
+   "id": "vuelta-mtb-batan-2027",
+   "nombre": "9ª Vuelta de MTB Rural a Batán",
+   "fecha": "2027-03-07",
+   "lugar": "Batán",
+   "sede": "",
+   "mapa": "",
+   "tipo": "MTB rural",
+   "estado": "Fecha confirmada, todavía no publicamos la información de esta edición",
+   "inscripcion_abierta": false,
+   "cierre_inscripcion": "",
+   "horarios": [],
+   "distancias": {},
+   "campeonato": "",
+   "incluye": "",
+   "organiza": "",
+   "info": "",
+   "link": "calendario/vuelta-mtb-batan-2027/",
+   "inscribirme": "",
+   "lista_inscriptos": "",
+   "tramos": [],
+   "categorias": {}
+  },
+  {
+   "id": "vuelta-escuela-granja-2027",
+   "nombre": "21ª Vuelta a la Escuela Granja",
+   "fecha": "2027-03-21",
+   "lugar": "Tandil",
+   "sede": "",
+   "mapa": "",
+   "tipo": "MTB rural",
+   "estado": "Fecha confirmada, todavía no publicamos la información de esta edición",
+   "inscripcion_abierta": false,
+   "cierre_inscripcion": "",
+   "horarios": [],
+   "distancias": {},
+   "campeonato": "",
+   "incluye": "",
+   "organiza": "",
+   "info": "",
+   "link": "calendario/vuelta-escuela-granja-2027/",
+   "inscribirme": "",
+   "lista_inscriptos": "",
+   "tramos": [],
+   "categorias": {}
+  }
+ ]
+}

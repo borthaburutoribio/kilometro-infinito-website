@@ -1,6 +1,6 @@
 /**
  * Kilómetro Infinito: inscripciones y fotos de la web.
- * Se pega en una planilla de Google de Adrián (Extensiones > Apps Script) y se publica como "App web".
+ * Se pega en una hoja de cálculo de Google (de Adrián o de Toribio) (Extensiones > Apps Script) y se publica como "App web".
  * Hace dos cosas:
  *  1. Recibe cada preinscripción de la web: guarda el comprobante en Drive, agrega una fila a la planilla
  *     de esa carrera (la de Adrián o la que comparte con el organizador) y le avisa a Adrián por mail.
@@ -19,6 +19,28 @@ function carpeta_(nombre, padre) {
 }
 
 const AVISAR_POR_MAIL = true;
+// A quién le llegan los avisos. Vacío = a la cuenta de Google donde está instalado esto.
+// Si lo instala Toribio en su cuenta, acá va el mail de Adrián (y la planilla se le comparte).
+const MAILS_AVISO = '';
+// Clave que comparte con el bot de WhatsApp para mandar avisos de "consulta para responder".
+const CLAVE_BOT = '';
+
+function destinatarios_() {
+  return MAILS_AVISO || Session.getEffectiveUser().getEmail();
+}
+
+// El bot de WhatsApp no supo responder: le avisa a Adrián por mail con el link para escribirle.
+function avisoBot_(d) {
+  if (!CLAVE_BOT || d.clave !== CLAVE_BOT) return json_({ ok: false, error: 'Clave incorrecta' });
+  const num = String(d.numero || '').replace(/\D/g, '');
+  MailApp.sendEmail(destinatarios_(), `Consulta de WhatsApp para responder: +${num}`,
+    `El bot de WhatsApp de KMI no pudo resolver esta consulta y le dijo a la persona que le vas a escribir vos.
+
+${texto_(d.motivo, 1500)}
+
+Escribile desde tu WhatsApp: https://wa.me/${num}`);
+  return json_({ ok: true });
+}
 
 // Pestaña "Carreras" de esta planilla: columna A = nombre de la carrera tal cual sale en la web,
 // columna B = link de la planilla de esa carrera (la que comparte con el organizador). Se crea sola.
@@ -51,6 +73,7 @@ function doPost(e) {
   try {
     lock.waitLock(20000);
     const d = JSON.parse(e.postData.contents);
+    if (d.tipo === 'aviso_bot') return avisoBot_(d);
     const obligatorios = ['carrera', 'nombre', 'apellido', 'dni', 'nac', 'cel', 'mail', 'categoria'];
     for (const k of obligatorios) if (!texto_(d[k])) return json_({ ok: false, error: 'Falta ' + k });
     if (!d.comprobante || !d.comprobante.data) return json_({ ok: false, error: 'Falta el comprobante' });
@@ -88,7 +111,7 @@ function doPost(e) {
     // Aviso por mail a Adrián (a la cuenta de Google donde está instalado esto)
     if (AVISAR_POR_MAIL) {
       try {
-        MailApp.sendEmail(Session.getEffectiveUser().getEmail(), `Nueva preinscripción: ${fila[2]} ${fila[3]} · ${carrera}`,
+        MailApp.sendEmail(destinatarios_(), `Nueva preinscripción: ${fila[2]} ${fila[3]} · ${carrera}`,
           `${fila[2]} ${fila[3]} (DNI ${dni}) se preinscribió desde la web en ${carrera}.\n${fila[8]} · $ ${fila[9]}\nCelular: ${fila[10]} · Mail: ${fila[11]}\n\nComprobante: ${fila[15]}\nPlanilla: ${libro.getUrl()}`);
       } catch (e2) { /* si se pasa del límite diario de mails, la inscripción igual queda guardada */ }
     }
