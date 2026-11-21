@@ -566,7 +566,7 @@ pickers = ''.join(f'<div data-for="{r["id"]}" hidden>{catpicker(r, "i-" + r["id"
 
 
 def fld(id_, lab, typ='text', extra='', full=False):
-    return f'<div class="fld{" full" if full else ""}"><label for="{id_}">{lab}</label><input id="{id_}" name="{id_[2:]}" type="{typ}" {extra}></div>'
+    return f'<div class="fld{" ancho" if full else ""}"><label for="{id_}">{lab}</label><input id="{id_}" name="{id_[2:]}" type="{typ}" {extra}></div>'
 
 
 ins = f'''<section class="ph"><div class="wrap"><h1>Inscribirme</h1><p class="lead">Cuatro pasos y listo: carrera, tus datos, la transferencia y el comprobante.</p></div></section>

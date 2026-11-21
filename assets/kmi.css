@@ -384,7 +384,7 @@ tr.me td{background:#FFF3B8!important;font-weight:600}
 .st .tool{margin-top:16px}
 .flds{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:14px}
 .fld{min-width:0}
-.fld.full{grid-column:1/-1}
+.fld.ancho{grid-column:1/-1}
 .fld label{display:block;font-weight:600;margin-bottom:6px;font-size:.9375rem}
 .fld input,.fld select{width:100%;min-height:52px;padding:10px 16px;border:1.5px solid var(--line);border-radius:var(--r-s);background:#fff;color:var(--text);font:500 1rem "Plus Jakarta Sans",sans-serif}
 .fld input:focus,.fld select:focus{border-color:var(--blue);outline:none;box-shadow:0 0 0 3px rgba(29,79,168,.18)}
