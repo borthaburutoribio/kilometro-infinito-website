@@ -11,7 +11,7 @@
 const CARPETA_COMPROBANTES = 'KMI - Comprobantes';
 const CARPETA_FOTOS = 'KMI - Fotos de carreras';
 const MAX_MB = 9;
-const COLUMNAS = ['Fecha', 'Estado', 'Apellido', 'Nombre', 'DNI', 'Nacimiento', 'Rama', 'Modalidad', 'Categoría', 'Monto', 'Celular', 'Mail', 'Ciudad', 'Equipo', 'Pareja o posta', 'Comprobante'];
+const COLUMNAS = ['Fecha', 'Estado', 'Apellido', 'Nombre', 'DNI', 'Nacimiento', 'Rama', 'Modalidad', 'Categoría', 'Monto', 'Celular', 'Mail', 'Ciudad', 'Equipo', 'Pareja o posta', 'Comprobante', 'Comentarios'];
 
 function carpeta_(nombre, padre) {
   const it = padre ? padre.getFoldersByName(nombre) : DriveApp.getFoldersByName(nombre);
@@ -104,7 +104,7 @@ function doPost(e) {
     const fila = [
       new Date(), 'Pendiente', texto_(d.apellido, 60), texto_(d.nombre, 60), dni, texto_(d.nac, 10), texto_(d.rama, 12),
       texto_(d.modalidad, 12), texto_(d.categoria, 40), Number(d.monto) || '', texto_(d.cel, 30), texto_(d.mail, 80),
-      texto_(d.ciudad, 60), texto_(d.equipo, 60), texto_(d.pareja, 120), archivo.getUrl()
+      texto_(d.ciudad, 60), texto_(d.equipo, 60), texto_(d.pareja, 120), archivo.getUrl(), texto_(d.coment, 300)
     ];
     hoja.appendRow(fila);
 

@@ -7,7 +7,7 @@ SITE = B.parent
 D = B / 'data'
 NOINDEX = True          # muestra: al lanzar con el dominio real, poner False
 DOMAIN = 'https://www.kilometroinfinito.com.ar'
-V = "10"
+V = "11"
 WA = '5492494551251'    # (0249) 15-455-1251, A CONFIRMAR que tenga WhatsApp
 # Inscripción: URL de la app de Google (Apps Script) de Adrián. Vacía = modo muestra (no guarda nada).
 INSC_URL = ''
@@ -584,7 +584,8 @@ ins = f'''<section class="ph"><div class="wrap"><h1>Inscribirme</h1><p class="le
 {fld('i-dni', 'DNI', extra='inputmode="numeric" required')}{fld('i-nac', 'Fecha de nacimiento', 'date', 'required')}
 {fld('i-cel', 'Celular con WhatsApp', 'tel', 'autocomplete="tel" placeholder="Ej.: 2494 551251" required')}{fld('i-mail', 'Mail', 'email', 'autocomplete="email" required')}
 {fld('i-ciudad', 'Ciudad', extra='autocomplete="address-level2" required')}{fld('i-equipo', 'Equipo o club (si tenés)')}
-{fld('i-pareja', 'Si corrés en pareja o en posta: nombre y DNI de tu compañero/a', full=True)}</div>
+{fld('i-pareja', 'Si corrés en pareja o en posta: nombre y DNI de tu compañero/a', full=True)}
+{fld('i-coment', 'Comentarios (por ejemplo, talle de remera)', full=True)}</div>
 <label class="chk"><input type="checkbox" id="i-rec" checked> Recordar mis datos en este celular para la próxima carrera</label>
 <div class="nav-st"><button type="button" class="btn line" data-prev>Volver</button><button type="button" class="btn y" data-next>Seguir</button></div></fieldset>
 

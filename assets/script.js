@@ -195,7 +195,7 @@
     const curPick = () => pickState.get($(`[data-for="${sel.value}"] .cp`, ins));
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const tierOf = race => race.tiers.find(t => today <= new Date(t.to + 'T23:59:00') && today >= new Date(t.from + 'T00:00:00'));
-    const F = ['nombre', 'apellido', 'dni', 'nac', 'cel', 'mail', 'ciudad', 'equipo', 'pareja'];
+    const F = ['nombre', 'apellido', 'dni', 'nac', 'cel', 'mail', 'ciudad', 'equipo', 'pareja', 'coment'];
     const KEY = 'kmi-corredor';
     try { const saved = JSON.parse(localStorage.getItem(KEY) || 'null'); if (saved) { F.forEach(k => { if (saved[k]) $('#i-' + k).value = saved[k]; }); $('#i-recordado').hidden = false; } } catch (e) {}
     let n = 1;
