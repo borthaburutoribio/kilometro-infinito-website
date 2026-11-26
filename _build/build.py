@@ -7,10 +7,10 @@ SITE = B.parent
 D = B / 'data'
 NOINDEX = True          # muestra: al lanzar con el dominio real, poner False
 DOMAIN = 'https://www.kilometroinfinito.com.ar'
-V = "12"
+V = "13"
 WA = '5492494551251'    # (0249) 15-455-1251, A CONFIRMAR que tenga WhatsApp
 # Inscripción: URL de la app de Google (Apps Script) de Adrián. Vacía = modo muestra (no guarda nada).
-INSC_URL = ''
+INSC_URL = 'https://script.google.com/macros/s/AKfycbyX5nslH1D2sNbe-xS3zNK0K2HwgkS162-wRtogjChUb85MXXIOvM4e_7yzB82oYqyEYQ/exec'
 # A CONFIRMAR con Adrián: datos de la cuenta para transferir.
 PAGO = {'alias': 'lorem.ipsum.kmi', 'cbu': '0000000000000000000000', 'titular': 'Lorem Ipsum (a confirmar)'}
 # Cada carrera puede tener su propia cuenta ('pago': {...}) y, si inscribe el organizador, su link ('ext': 'https://...').

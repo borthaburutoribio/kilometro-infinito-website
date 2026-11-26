@@ -293,14 +293,16 @@
     grid.addEventListener('click', e => { const b = e.target.closest('[data-j]'); if (!b) return; last = b; show(+b.dataset.j); lb.classList.add('open'); $('.x', lb).focus(); });
     $('.alb-back', view).onclick = () => { view.hidden = true; list.hidden = false; };
     const card = (nombre, n, tapa, act) => `<button type="button" class="alb" data-act="${esc(act)}"><img src="${esc(tapa)}" alt="" loading="lazy"><b>${esc(nombre)}</b><span class="small">${n} fotos</span></button>`;
-    if (!url) {
+    const verDemo = () => {
       const fs = demo.fotos.map(u => ({ small: u, full: u, dl: u }));
       list.innerHTML = card(demo.nombre, fs.length, fs[0].small, 'demo');
       list.onclick = e => { if (e.target.closest('.alb')) open(demo.nombre, fs); };
-    } else {
+    };
+    if (!url) verDemo();
+    else {
       list.innerHTML = '<p>Cargando las carreras…</p>';
       fetch(url + '?fotos=lista').then(r => r.json()).then(al => {
-        if (!al.length) { list.innerHTML = '<p>Todavía no hay fotos cargadas.</p>'; return; }
+        if (!al.length) { verDemo(); return; }
         list.innerHTML = al.map(a => card(a.nombre, a.n, th(a.tapa, 600), a.id)).join('');
         list.onclick = e => { const b = e.target.closest('.alb'); if (!b) return; b.disabled = true;
           fetch(url + '?fotos=' + encodeURIComponent(b.dataset.act)).then(r => r.json()).then(d => open(d.nombre, d.fotos.map(id => ({ small: th(id, 600), full: th(id, 1600), dl: 'https://drive.google.com/uc?export=download&id=' + encodeURIComponent(id) })))).finally(() => { b.disabled = false; }); };
