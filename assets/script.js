@@ -225,6 +225,7 @@
     const fillPay = () => {
       const race = RACES[sel.value], s = curPick(), t = tierOf(race), i = race.tiers.indexOf(t), nx = race.tiers[i + 1];
       $('#i-monto').textContent = pesos(t[s.mod]);
+      if (race.pago) { $('#i-alias').textContent = race.pago.alias; $('#i-cbu').textContent = race.pago.cbu; $('#i-tit').textContent = race.pago.titular; }
       $('#i-tramo').textContent = `${race.name} · ${s.cat}. Este precio vale hasta el ${fecha(t.to)}` + (nx ? `; desde el día siguiente es ${pesos(nx[s.mod])}.` : '.');
     };
     ins.addEventListener('click', e => {

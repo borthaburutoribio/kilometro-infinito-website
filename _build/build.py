@@ -7,12 +7,14 @@ SITE = B.parent
 D = B / 'data'
 NOINDEX = True          # muestra: al lanzar con el dominio real, poner False
 DOMAIN = 'https://www.kilometroinfinito.com.ar'
-V = "11"
+V = "12"
 WA = '5492494551251'    # (0249) 15-455-1251, A CONFIRMAR que tenga WhatsApp
 # Inscripción: URL de la app de Google (Apps Script) de Adrián. Vacía = modo muestra (no guarda nada).
 INSC_URL = ''
 # A CONFIRMAR con Adrián: datos de la cuenta para transferir.
 PAGO = {'alias': 'lorem.ipsum.kmi', 'cbu': '0000000000000000000000', 'titular': 'Lorem Ipsum (a confirmar)'}
+# Cada carrera puede tener su propia cuenta ('pago': {...}) y, si inscribe el organizador, su link ('ext': 'https://...').
+def pago_de(r): return r.get('pago') or PAGO
 FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSegLqTnWHF24_hhah0eCGhpEGIKlq71XwLnVv1Ek3I0skuifA/viewform'
 MAIL = 'kminfinito@live.com.ar'
 IG = 'https://www.instagram.com/kminfinito/'
@@ -338,7 +340,7 @@ for r in RACES:
         tool = f'''<section class="sec" id="inscripcion"><div class="wrap two">
 <div class="tool on-ink" id="catfinder"><h2>Tu categoría</h2>
 {catpicker(r, 'cf')}
-<div class="btns" style="margin-top:22px"><a class="btn y" href="{{{{R}}}}inscribirme/?c={r['id']}">Inscribirme</a>{f'<a class="btn line" href="{r["insc"]}" rel="noopener">Ver lista de inscriptos</a>' if r['insc'] else ''}</div>
+<div class="btns" style="margin-top:22px">{f'<a class="btn y" href="{r["ext"]}" target="_blank" rel="noopener">Inscribirme en la web del organizador</a>' if r.get('ext') else f'<a class="btn y" href="{{{{R}}}}inscribirme/?c={r["id"]}">Inscribirme</a>'}{f'<a class="btn line" href="{r["insc"]}" rel="noopener">Ver lista de inscriptos</a>' if r['insc'] else ''}</div>
 <p class="small" style="margin-top:14px">Te anotás desde acá: cargás tus datos, transferís y subís el comprobante. Sin comprobante no queda hecha la preinscripción.</p>
 </div>
 <div><h2>Costo de inscripción</h2>{tiers}<p style="margin-top:18px">{esc(r.get('refund', ''))}</p><p style="margin-top:10px"><b>Incluye:</b> {esc(r['incl'])}</p>{f'<p style="margin-top:10px"><b>Premios:</b> {esc(r["prizes"])}</p>' if r.get('prizes') else ''}
@@ -543,7 +545,7 @@ insc = f'''<section class="ph"><div class="wrap"><h1>Cómo inscribirme</h1><p cl
 page('inscripcion/index.html', 'Cómo inscribirme en una carrera de KMI | Paso a paso', 'Datos, transferencia y comprobante, todo desde la web: cómo inscribirte en las carreras con el crono de Kilómetro Infinito y a quién preguntarle.', insc, schema=[faq_schema(FAQ)])
 
 # ---------------------------------------------------------------- Inscribirme (formulario completo)
-OPEN = [r for r in RACES if r['open']]
+OPEN = [r for r in RACES if r['open'] and not r.get('ext')]
 
 # Lista de carreras para el bot de WhatsApp: la lee sola, así su prompt no se toca nunca.
 _MODN = {'comp': 'competitiva', 'promo': 'promocional', 'prin': 'principiante'}
@@ -553,14 +555,14 @@ _bot = {'actualizado': datetime.date.today().isoformat(), 'anio_referencia': 202
     'cierre_inscripcion': r['tiers'][-1]['to'] if r['tiers'] else '',
     'horarios': [f'{a}: {b}' for a, b in r['sched']], 'distancias': {_MODN[k]: v for k, v in r['dist'].items()},
     'campeonato': r.get('champ', ''), 'incluye': r.get('incl', ''), 'organiza': r.get('org', ''), 'info': r.get('info', ''),
-    'link': f'calendario/{r["id"]}/', 'inscribirme': f'inscribirme/?c={r["id"]}' if r['open'] else '', 'lista_inscriptos': r.get('insc', ''),
+    'link': f'calendario/{r["id"]}/', 'inscribirme': (r.get('ext') or f'inscribirme/?c={r["id"]}') if r['open'] else '', 'lista_inscriptos': r.get('insc', ''),
     'tramos': [{'desde': t['from'], 'hasta': t['to'], **{_MODN[k]: v for k, v in t.items() if k in _MODN}} for t in r['tiers']],
     'categorias': {_MODN[m]: {'damas': g.get('d', []), 'caballeros': g.get('c', [])} for m, g in r['cats'].items()},
 } for r in RACES]}
 (SITE / 'assets/data').mkdir(parents=True, exist_ok=True)
 json.dump(_bot, open(SITE / 'assets/data/carreras.json', 'w', encoding='utf8'), ensure_ascii=False, indent=1)
 
-races_map = {r['id']: {'name': r['name'], 'date': r['date'], 'tiers': r['tiers'], 'cats': r['cats'], 'dist': r['dist'], 'insc': r['insc'], 'year': 2026} for r in OPEN}
+races_map = {r['id']: {'name': r['name'], 'date': r['date'], 'tiers': r['tiers'], 'cats': r['cats'], 'dist': r['dist'], 'insc': r['insc'], 'pago': pago_de(r), 'year': 2026} for r in OPEN}
 race_opts = ''.join(f'<option value="{r["id"]}">{esc(r["name"])} · {fdate(r["date"])}</option>' for r in OPEN)
 pickers = ''.join(f'<div data-for="{r["id"]}" hidden>{catpicker(r, "i-" + r["id"])}</div>' for r in OPEN)
 
@@ -591,7 +593,7 @@ ins = f'''<section class="ph"><div class="wrap"><h1>Inscribirme</h1><p class="le
 
 <fieldset class="st" data-st="3" hidden><legend>3. Transferí</legend>
 <div class="pay"><p class="small">Monto de hoy</p><p class="pay-m" id="i-monto">-</p><p class="small" id="i-tramo"></p>
-<dl class="facts"><dt>Alias</dt><dd><b id="i-alias">{PAGO['alias']}</b> <button type="button" class="copy" data-copy="i-alias">Copiar</button></dd><dt>CBU</dt><dd><span id="i-cbu">{PAGO['cbu']}</span> <button type="button" class="copy" data-copy="i-cbu">Copiar</button></dd><dt>Titular</dt><dd>{PAGO['titular']}</dd></dl>
+<dl class="facts"><dt>Alias</dt><dd><b id="i-alias">{PAGO['alias']}</b> <button type="button" class="copy" data-copy="i-alias">Copiar</button></dd><dt>CBU</dt><dd><span id="i-cbu">{PAGO['cbu']}</span> <button type="button" class="copy" data-copy="i-cbu">Copiar</button></dd><dt>Titular</dt><dd id="i-tit">{PAGO['titular']}</dd></dl>
 <p class="small">Cuando hagas la transferencia, guardá la captura del comprobante: la subís en el paso siguiente.</p></div>
 <div class="nav-st"><button type="button" class="btn line" data-prev>Volver</button><button type="button" class="btn y" data-next>Ya transferí</button></div></fieldset>
 

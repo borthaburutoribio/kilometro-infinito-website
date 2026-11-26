@@ -21,7 +21,7 @@ function carpeta_(nombre, padre) {
 const AVISAR_POR_MAIL = true;
 // A quién le llegan los avisos. Vacío = a la cuenta de Google donde está instalado esto.
 // Si lo instala Toribio en su cuenta, acá va el mail de Adrián (y la planilla se le comparte).
-const MAILS_AVISO = '';
+const MAILS_AVISO = 'granpremiopb@gmail.com';
 // Clave que comparte con el bot de WhatsApp para mandar avisos de "consulta para responder".
 const CLAVE_BOT = '';
 
