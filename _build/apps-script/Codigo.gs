@@ -102,8 +102,8 @@ function doPost(e) {
       hoja.getRange(1, 1, 1, COLUMNAS.length).setFontWeight('bold');
     }
     const fila = [
-      new Date(), 'Pendiente', texto_(d.apellido, 60), texto_(d.nombre, 60), dni, texto_(d.nac, 10), texto_(d.rama, 12),
-      texto_(d.modalidad, 12), texto_(d.categoria, 40), Number(d.monto) || '', texto_(d.cel, 30), texto_(d.mail, 80),
+      new Date(), 'Pendiente', texto_(d.apellido, 60), texto_(d.nombre, 60), "'" + dni, texto_(d.nac, 10), texto_(d.rama, 12),
+      ({ comp: 'Competitiva', promo: 'Promocional', prin: 'Principiante' })[d.modalidad] || texto_(d.modalidad, 20), texto_(d.categoria, 40), Number(d.monto) || '', "'" + texto_(d.cel, 30), texto_(d.mail, 80),
       texto_(d.ciudad, 60), texto_(d.equipo, 60), texto_(d.pareja, 120), archivo.getUrl(), texto_(d.coment, 300)
     ];
     hoja.appendRow(fila);
